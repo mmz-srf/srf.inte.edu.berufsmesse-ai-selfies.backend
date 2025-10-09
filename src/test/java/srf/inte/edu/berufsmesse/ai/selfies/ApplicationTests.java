@@ -1,4 +1,4 @@
-package srf.inte.edu.berufsmesse.ai_selfies;
+package srf.inte.edu.berufsmesse.ai.selfies;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

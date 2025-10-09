@@ -1,4 +1,4 @@
-package srf.inte.edu.berufsmesse.ai_selfies;
+package srf.inte.edu.berufsmesse.ai.selfies;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
