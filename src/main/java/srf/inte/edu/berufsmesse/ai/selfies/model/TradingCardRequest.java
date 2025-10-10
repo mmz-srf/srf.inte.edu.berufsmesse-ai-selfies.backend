@@ -8,3 +8,4 @@ public class TradingCardRequest {
     private String selfieId;   // Reference to saved Selfie
     private String theme;      // "electric", "fire"
 }
+
