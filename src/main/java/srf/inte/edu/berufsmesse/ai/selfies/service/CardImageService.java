@@ -84,7 +84,7 @@ public class CardImageService {
             Assert.notNull(inputStream, "no input-stream present");
 
             var prompt = new String(inputStream.readAllBytes());
-            prompt = prompt.replace("%IMAGE%", workflowImagePath);
+            prompt = prompt.replace("{{IMAGE}}", workflowImagePath);
 
             var response = restTemplate.postForEntity(COMFY_UI_BASE_URL + "/prompt", new HttpEntity<>(prompt), PromptResponse.class);
             workflowId = Objects.requireNonNull(response.getBody()).getPromptId();

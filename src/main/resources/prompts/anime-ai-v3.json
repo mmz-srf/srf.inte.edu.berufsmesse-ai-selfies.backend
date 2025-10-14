@@ -149,7 +149,7 @@
     },
     "32":{
       "inputs":{
-        "image":"%IMAGE%"
+        "image":"{{IMAGE}}"
       },
       "class_type":"LoadImage",
       "_meta":{
@@ -627,7 +627,7 @@
               "Node name for S&R":"LoadImage"
             },
             "widgets_values":[
-              "%IMAGE%",
+              "{{IMAGE}}",
               "image"
             ]
           }
