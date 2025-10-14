@@ -22,7 +22,7 @@ public class CardImageApi {
     private final CardImageService tradingCardService;
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> createTradingCard(@RequestBody CardImageRequest request) {
+    public ResponseEntity<Map<String, String>> createCardImage(@RequestBody CardImageRequest request) {
         log.info("Creating trading card for {}", request.getSelfieId());
         Map<String, String> workflowId = new HashMap<>();
         workflowId.put("workflowId", tradingCardService.createCard(request));

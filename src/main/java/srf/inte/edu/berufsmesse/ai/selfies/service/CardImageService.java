@@ -13,6 +13,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import srf.inte.edu.berufsmesse.ai.selfies.model.PromptResponse;
 import srf.inte.edu.berufsmesse.ai.selfies.model.CardImageRequest;
+import srf.inte.edu.berufsmesse.ai.selfies.model.UploadResponse;
 
 import java.io.IOException;
 import java.util.*;
@@ -56,10 +57,22 @@ public class CardImageService {
         HttpEntity<MultiValueMap<String, Object>> uploadRequest =
                 new HttpEntity<>(uploadData, uploadHeaders);
 
+        String workflowImagePath = selfieId + ".png";
         try {
-            ResponseEntity<String> uploadResponse =
-                    restTemplate.postForEntity(uploadUrl, uploadRequest, String.class);
+            ResponseEntity<UploadResponse> uploadResponse =
+                    restTemplate.postForEntity(uploadUrl, uploadRequest, UploadResponse.class);
             log.info("Uploaded image to ComfyUI: {}", uploadResponse.getBody());
+            UploadResponse uploadResponseBody = uploadResponse.getBody();
+
+            // ComfyUI may change the filename of the uploaded image
+            String subfolder = uploadResponseBody != null ? uploadResponseBody.getSubfolder() : "";
+            String fileName = Objects.requireNonNull(uploadResponseBody).getName();
+            if (subfolder != null && !subfolder.isBlank()) {
+                workflowImagePath = String.format("%s/%s", subfolder, fileName);
+            } else if (fileName != null && !fileName.isBlank()) {
+                workflowImagePath = fileName;
+            }
+
         } catch (Exception e) {
             log.error("Upload to ComfyUI failed", e);
             throw new RuntimeException("Failed to upload image to ComfyUI");
@@ -71,7 +84,7 @@ public class CardImageService {
             Assert.notNull(inputStream, "no input-stream present");
 
             var prompt = new String(inputStream.readAllBytes());
-            prompt = prompt.replace("%IMAGE%", selfieId + ".png");
+            prompt = prompt.replace("%IMAGE%", workflowImagePath);
 
             var response = restTemplate.postForEntity(COMFY_UI_BASE_URL + "/prompt", new HttpEntity<>(prompt), PromptResponse.class);
             workflowId = Objects.requireNonNull(response.getBody()).getPromptId();
