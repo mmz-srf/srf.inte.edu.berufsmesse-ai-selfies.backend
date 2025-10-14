@@ -627,7 +627,7 @@
               "Node name for S&R":"LoadImage"
             },
             "widgets_values":[
-              "80D13DB1-A3B2-4F5A-B0C5-23E589754D33_1_201_a.jpeg",
+              "%IMAGE%",
               "image"
             ]
           }
