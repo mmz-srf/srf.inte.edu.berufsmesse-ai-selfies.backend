@@ -33,6 +33,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.apache.xmlgraphics:batik-transcoder:1.19")
     implementation("org.apache.xmlgraphics:batik-codec:1.19")
+    implementation("software.amazon.awssdk:s3:2.35.6")
 }
 
 tasks.withType<Test> {

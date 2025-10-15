@@ -7,3 +7,8 @@ settings:
     max-name-length: 20
     comfyui-url: http://192.168.2.1:8188
     prompt-path: "/prompts/anime-ai-v3.json"
+
+s3:
+  uri: "https://srf-staticfiles-production.s3.eu-central-1.amazonaws.com"
+  bucket: "staticfiles/berufsmesse/ki-pics/"
+  user-path: "berufsmesse/ki-pics/"
