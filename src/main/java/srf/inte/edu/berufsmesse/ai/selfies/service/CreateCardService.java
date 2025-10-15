@@ -1,11 +1,13 @@
 package srf.inte.edu.berufsmesse.ai.selfies.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.CreateCardRequest;
 
 import java.io.ByteArrayInputStream;
@@ -17,26 +19,26 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CreateCardService {
 
-    private static final String COMFY_UI_BASE_URL = "http://192.168.2.1:8188";
+    private final DocumentProperties documentProperties;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // TODO: Move this to application.properties
-    private static final List<String> VALID_TEMPLATES = List.of("mockup.svg");
-
     public byte[] createCard(CreateCardRequest request) {
-
+        String comfyBaseUrl = documentProperties.getComfyuiUrl();
+        List<String> validTemplates = documentProperties.getAllowedTemplates();
+        int maxNameLength = documentProperties.getMaxNameLength();
         // Validate request
-        if (!VALID_TEMPLATES.contains(request.getTemplate())) {
+        if (!validTemplates.contains(request.getTemplate())) {
             throw new IllegalArgumentException("Invalid template");
         }
-        if (request.getName().length() > 20) {
+        if (request.getName().length() > maxNameLength) {
             throw new IllegalArgumentException("Name too long");
         }
 
         // Get comfyUI image as base64
-        String url = COMFY_UI_BASE_URL + "/view?filename=" + request.getImagePath() + "&type=output";
+        String url = comfyBaseUrl + "/view?filename=" + request.getImagePath() + "&type=output";
         byte[] imageBytes = restTemplate.getForObject(url, byte[].class);
         String base64 = Base64.getEncoder().encodeToString(imageBytes);
 

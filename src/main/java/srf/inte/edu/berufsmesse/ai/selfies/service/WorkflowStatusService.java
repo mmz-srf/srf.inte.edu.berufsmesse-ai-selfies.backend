@@ -1,8 +1,10 @@
 package srf.inte.edu.berufsmesse.ai.selfies.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.QueueResponse;
 
 import java.util.HashMap;
@@ -10,14 +12,16 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class WorkflowStatusService {
 
-    private static final String COMFY_UI_BASE_URL = "http://192.168.2.1:8188";
+    private final DocumentProperties documentProperties;
     private final RestTemplate restTemplate = new RestTemplate();
 
     public Map<String, String> getStatus(String workflowId) {
-        String statusUrl = COMFY_UI_BASE_URL + "/history/" + workflowId;
-        String queueUrl = COMFY_UI_BASE_URL + "/queue";
+        String comfyBaseUrl = documentProperties.getComfyuiUrl();
+        String statusUrl = comfyBaseUrl + "/history/" + workflowId;
+        String queueUrl = comfyBaseUrl + "/queue";
 
         Map<String, String> result = new HashMap<>();
         result.put("workflowId", workflowId);

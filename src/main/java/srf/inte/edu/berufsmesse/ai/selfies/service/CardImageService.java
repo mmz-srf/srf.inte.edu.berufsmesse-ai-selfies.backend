@@ -1,5 +1,6 @@
 package srf.inte.edu.berufsmesse.ai.selfies.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -11,6 +12,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.PromptResponse;
 import srf.inte.edu.berufsmesse.ai.selfies.model.CardImageRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.model.UploadResponse;
@@ -20,10 +22,10 @@ import java.util.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CardImageService {
 
-    private static final String COMFY_UI_BASE_URL = "http://192.168.2.1:8188";
-    private static final String PROMPT_PATH = "/prompts/anime-ai-v3.json";
+    private final DocumentProperties documentProperties;
 
     public String createCard(CardImageRequest request) {
         log.info("Creating AI trading card for {}", request.getSelfieId());
@@ -33,10 +35,12 @@ public class CardImageService {
     }
 
     private String callComfyUI(String selfieId, String base64) {
+        String comfyBaseUrl = documentProperties.getComfyuiUrl();
+         String promptPath = documentProperties.getPromptPath();
         RestTemplate restTemplate = new RestTemplate();
 
         // Request to upload the image to comfyUI
-        String uploadUrl = COMFY_UI_BASE_URL + "/upload/image";
+        String uploadUrl = comfyBaseUrl + "/upload/image";
 
         // Base64 -> byte[]
         byte[] imageBytes = convertBase64ToBytes(base64);
@@ -80,13 +84,13 @@ public class CardImageService {
 
         // Start ComfyUI workflow
         String workflowId;
-        try (var inputStream = CardImageService.class.getResourceAsStream(PROMPT_PATH)) {
+        try (var inputStream = CardImageService.class.getResourceAsStream(promptPath)) {
             Assert.notNull(inputStream, "no input-stream present");
 
             var prompt = new String(inputStream.readAllBytes());
             prompt = prompt.replace("{{IMAGE}}", workflowImagePath);
 
-            var response = restTemplate.postForEntity(COMFY_UI_BASE_URL + "/prompt", new HttpEntity<>(prompt), PromptResponse.class);
+            var response = restTemplate.postForEntity(comfyBaseUrl + "/prompt", new HttpEntity<>(prompt), PromptResponse.class);
             workflowId = Objects.requireNonNull(response.getBody()).getPromptId();
         } catch (IOException ioException) {
             throw new IllegalStateException("failed to load prompt-template", ioException);
