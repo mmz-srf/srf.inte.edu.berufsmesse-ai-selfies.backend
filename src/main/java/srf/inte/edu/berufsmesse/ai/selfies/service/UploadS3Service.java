@@ -9,10 +9,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.WriteGetObjectResponseRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.S3Properties;
-
-import java.net.URI;
 
 @Service
 @RequiredArgsConstructor
@@ -22,23 +19,20 @@ public class UploadS3Service {
     private final S3Properties s3Properties;
 
     public String upload(byte[] image, String name) {
-        log.info("Uploading {} to S3 Bucket: {}, Region: {}, URI: {}",
+        log.info("Uploading {} to S3 Bucket: {}, Region: {}",
                  name,
                  s3Properties.getBucket(),
-                 Region.EU_CENTRAL_1,
-                 s3Properties.getUri()
+                 Region.EU_CENTRAL_1
         );
 
         AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(
-                System.getenv("AWS_ACCESS_KEY_ID"),
-                System.getenv("AWS_SECRET_ACCESS_KEY")
+                s3Properties.getAccessKey(),
+                s3Properties.getSecretKey()
         );
 
         S3Client s3 = S3Client.builder()
                               .region(Region.EU_CENTRAL_1)
                               .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
-                              .endpointOverride(URI.create(s3Properties.getUri()))
-                              .forcePathStyle(true)
                               .build();
 
 
@@ -53,6 +47,6 @@ public class UploadS3Service {
         s3.putObject(request, RequestBody.fromBytes(image));
         s3.close();
 
-        return "link to image on s3";
+        return "https://www.srf.ch/staticfiles/berufsmesse/ki-pics/" + name;
     }
 }

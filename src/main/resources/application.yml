@@ -9,6 +9,7 @@ settings:
     prompt-path: "/prompts/anime-ai-v3.json"
 
 s3:
-  uri: "https://srf-staticfiles-production.s3.eu-central-1.amazonaws.com"
-  bucket: "staticfiles/berufsmesse/ki-pics/"
+  bucket: "srf-staticfiles-production"
   user-path: "berufsmesse/ki-pics/"
+  access-key: ${AWS_ACCESS_KEY_ID}
+  secret-key: ${AWS_SECRET_ACCESS_KEY}

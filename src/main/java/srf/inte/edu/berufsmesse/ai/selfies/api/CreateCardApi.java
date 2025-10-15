@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import srf.inte.edu.berufsmesse.ai.selfies.model.CreateCardRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.service.CreateCardService;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/create-card")
 @RequiredArgsConstructor
@@ -19,12 +21,12 @@ public class CreateCardApi {
 
     private final CreateCardService createCardService;
 
-    @PostMapping(produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<byte[]> createCard(@RequestBody CreateCardRequest request) {
+    @PostMapping
+    public ResponseEntity<Map<String, String>> createCard(@RequestBody CreateCardRequest request) {
         log.info("Creating trading card for {}, with template {}", request.getImagePath(), request.getTemplate());
 
         return ResponseEntity.ok()
-                             .contentType(MediaType.IMAGE_PNG)
-                             .body(createCardService.createCard(request));
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(Map.of("link", createCardService.createCard(request)));
     }
 }

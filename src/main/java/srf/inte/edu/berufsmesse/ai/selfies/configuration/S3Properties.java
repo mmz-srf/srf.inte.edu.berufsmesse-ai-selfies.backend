@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "s3")
 @Data
 public class S3Properties {
-    private String uri;
     private String userPath;
     private String bucket;
+    private String accessKey;
+    private String secretKey;
 }

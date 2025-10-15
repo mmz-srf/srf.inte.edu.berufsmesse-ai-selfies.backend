@@ -26,7 +26,7 @@ public class CreateCardService {
     private final UploadS3Service uploadS3Service;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public byte[] createCard(CreateCardRequest request) {
+    public String createCard(CreateCardRequest request) {
         String comfyBaseUrl = documentProperties.getComfyuiUrl();
         List<String> validTemplates = documentProperties.getAllowedTemplates();
         int maxNameLength = documentProperties.getMaxNameLength();
@@ -57,8 +57,7 @@ public class CreateCardService {
             // Convert svg to png
             try {
                 byte[] pngBytes = convertSvgToPng(svg);
-                uploadS3Service.upload(pngBytes, request.getSelfieId() + ".png");
-                return pngBytes; // TODO return link to image
+                return uploadS3Service.upload(pngBytes, request.getSelfieId() + ".png");
             } catch (Exception e) {
                 log.error("Failed to convert svg to png", e);
                 throw new RuntimeException(e);
