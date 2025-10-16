@@ -32,7 +32,6 @@
 <text fill="white" stroke="#8D0614" stroke-width="2" xml:space="preserve" style="white-space: pre" font-family="SRG SSR Type Text" font-size="60" font-style="italic" font-weight="bold" letter-spacing="0em"><tspan x="628" y="134.94">#5</tspan></text>
 <path d="M52.5 743H693.5" stroke="#FFBBBC" stroke-width="1.3"/>
 </g>
-<defs>
 <filter id="filter0_fn_2_12" x="69.6069" y="-236.386" width="974.02" height="1183.21" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
 <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
@@ -119,7 +118,7 @@
 </feMerge>
 </filter>
 <pattern id="pattern0_2_12" patternContentUnits="objectBoundingBox" width="1" height="1">
-<use xlink:href="#image0_2_12" transform="scale(0.00153917 0.00238095)"/>
+<use xlink:href="#image0_2_12" />
 </pattern>
 <linearGradient id="paint0_linear_2_12" x1="161.5" y1="-3.4955e-06" x2="617" y2="1050" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#C91024"/>
@@ -128,6 +127,7 @@
 <clipPath id="clip0_2_12">
 <rect width="750" height="1050" rx="40" fill="white"/>
 </clipPath>
-<image id="image0_2_12" width="650" height="420" preserveAspectRatio="none" xlink:href="data:image/png;base64,{{BASE64}}"/>
-</defs>
+<g mask="url(#mask0_2_12)">
+<image x="50" y="118" id="image0_2_12" width="650" height="420" preserveAspectRatio="none" xlink:href="data:image/png;base64,{{BASE64}}"/>
+</g>
 </svg>
