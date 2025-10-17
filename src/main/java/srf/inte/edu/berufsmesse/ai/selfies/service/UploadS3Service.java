@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.S3Properties;
 
+import java.util.Base64;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -18,9 +20,11 @@ public class UploadS3Service {
 
     private final S3Properties s3Properties;
 
-    public String upload(byte[] image, String name) {
-        log.info("Uploading {} to S3 Bucket: {}, Region: {}",
+    public String upload(String base64Image, String name) {
+        byte[] image = Base64.getDecoder().decode(base64Image); // Turn base64 back into bytes
+        log.info("Uploading {} (Bytes: {}) to S3 Bucket: {}, Region: {}",
                  name,
+                 image.length,
                  s3Properties.getBucket(),
                  Region.EU_CENTRAL_1
         );
@@ -34,9 +38,6 @@ public class UploadS3Service {
                               .region(Region.EU_CENTRAL_1)
                               .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
                               .build();
-
-
-        log.info("Connecting to bucket: {} for path: {}", s3Properties.getBucket(), s3Properties.getUserPath() + name);
 
         PutObjectRequest request = PutObjectRequest.builder()
                                                    .bucket(s3Properties.getBucket())

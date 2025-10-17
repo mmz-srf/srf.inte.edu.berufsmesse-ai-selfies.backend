@@ -2,18 +2,12 @@ package srf.inte.edu.berufsmesse.ai.selfies.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.CreateCardRequest;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
@@ -23,7 +17,6 @@ import java.util.List;
 public class CreateCardService {
 
     private final DocumentProperties documentProperties;
-    private final UploadS3Service uploadS3Service;
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String createCard(CreateCardRequest request) {
@@ -43,45 +36,24 @@ public class CreateCardService {
         byte[] imageBytes = restTemplate.getForObject(url, byte[].class);
         String base64 = Base64.getEncoder().encodeToString(imageBytes);
 
-        String TEMPLATE_PATH = "/templates/" + request.getTemplate();
+        String templatePath = "/templates/" + request.getTemplate();
 
         // Load svg template
-        try (var inputStream = CreateCardService.class.getResourceAsStream(TEMPLATE_PATH)) {
+        try (var inputStream = CreateCardService.class.getResourceAsStream(templatePath)) {
             assert inputStream != null;
             var svg = new String(inputStream.readAllBytes());
 
             // Replace placeholders
             svg = svg.replace("{{NAME}}", request.getName());
-            svg = svg.replace("{{BASE64}}", base64);
+            svg = svg.replace("{{BASE64}}", "data:image/png;base64," + base64);
+            svg = fixSvg(svg);
 
-            // Convert svg to png
-            try {
-                byte[] pngBytes = convertSvgToPng(svg);
-                return uploadS3Service.upload(pngBytes, request.getSelfieId() + ".png");
-            } catch (Exception e) {
-                log.error("Failed to convert svg to png", e);
-                throw new RuntimeException(e);
-            }
+            // Return svg string to frontend
+            return svg;
         } catch (IOException e) {
             log.error("Failed to load template", e);
             throw new RuntimeException(e);
         }
-    }
-
-    public byte[] convertSvgToPng(String svgContent) throws Exception {
-        PNGTranscoder transcoder = new PNGTranscoder();
-        svgContent = fixSvg(svgContent);
-        // Input from SVG string
-        TranscoderInput input = new TranscoderInput(new ByteArrayInputStream(svgContent.getBytes(StandardCharsets.UTF_8)));
-
-        // Output to byte array
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        TranscoderOutput output = new TranscoderOutput(outputStream);
-
-        transcoder.transcode(input, output);
-        outputStream.flush();
-
-        return outputStream.toByteArray();
     }
 
     private String fixSvg(String svg) {
