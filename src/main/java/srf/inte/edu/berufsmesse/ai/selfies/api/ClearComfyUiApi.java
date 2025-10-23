@@ -5,12 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import srf.inte.edu.berufsmesse.ai.selfies.model.ClearComfyUiRequest;
+import srf.inte.edu.berufsmesse.ai.selfies.service.ClearComfyUiService;
 
 @RestController
 @RequestMapping("/api/v1/clear-comfy-ui")
 @RequiredArgsConstructor
 @Slf4j
 public class ClearComfyUiApi {
+
+    private final ClearComfyUiService clearComfyUiService;
 
     @PostMapping("/clear-all")
     @CrossOrigin(origins = "http://localhost:3000")
@@ -23,7 +26,7 @@ public class ClearComfyUiApi {
             return ResponseEntity.badRequest().build();
         }
 
-        // TODO Implemet clearing all caches
+        clearComfyUiService.clearComfyUi(workflowId, imagePath, selfieId);
         return ResponseEntity.ok().build();
     }
 }
