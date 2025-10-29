@@ -13,7 +13,6 @@ import srf.inte.edu.berufsmesse.ai.selfies.model.ClearComfyUiRequest;
 public class ClearComfyUiApi {
 
     @PostMapping("/clear-all")
-    @CrossOrigin(origins = "https://192.168.2.1:3000")
     public ResponseEntity<Void> clearComfyUiCache(@RequestBody ClearComfyUiRequest request) {
         String workflowId = request.getWorkflowId();
         String imagePath = request.getImagePath();

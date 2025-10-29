@@ -19,7 +19,6 @@ public class CardImageApi {
     private final CardImageService tradingCardService;
 
     @PostMapping
-    @CrossOrigin(origins = "https://192.168.2.1:3000")
     public ResponseEntity<Map<String, String>> createCardImage(@RequestBody CardImageRequest request) {
         log.info("Generating image for {}", request.getSelfieId());
         Map<String, String> workflowId = new HashMap<>();
