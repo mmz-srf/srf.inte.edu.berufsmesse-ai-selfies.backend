@@ -19,7 +19,7 @@ public class CreateCardApi {
     private final CreateCardService createCardService;
 
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "https://192.168.2.1:3000")
     public ResponseEntity<Map<String, String>> createCard(@RequestBody CreateCardRequest request) {
         log.info("Creating trading card for {}, with template {}", request.getImagePath(), request.getTemplate());
 
