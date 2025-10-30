@@ -1,12 +1,22 @@
+server:
+  ssl:
+    enabled: true
+    key-store: "classpath:keystore.p12"
+    key-store-password: "secret"
+    key-store-type: "PKCS12"
+    key-alias: "mac-mini"
+  port: 8443
+
 spring:
   application:
     name: ai-selfies
 
+
 settings:
-    allowed-templates: ["mockup.svg", "srf-v1.svg"]
-    max-name-length: 20
-    comfyui-url: http://192.168.2.1:8188
-    prompt-path: "/prompts/anime-ai-v3.json"
+  allowed-templates: [ "mockup.svg", "srf-v1.svg" ]
+  max-name-length: 20
+  comfyui-url: http://192.168.2.1:8188
+  prompt-path: "/prompts/anime-ai-v3.json"
 
 s3:
   bucket: "srf-staticfiles-production"
