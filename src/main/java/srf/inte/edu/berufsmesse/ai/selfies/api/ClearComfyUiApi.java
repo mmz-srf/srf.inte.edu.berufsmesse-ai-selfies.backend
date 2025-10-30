@@ -15,18 +15,16 @@ public class ClearComfyUiApi {
 
     private final ClearComfyUiService clearComfyUiService;
 
-    @PostMapping("/clear-all")
-    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping
     public ResponseEntity<Void> clearComfyUiCache(@RequestBody ClearComfyUiRequest request) {
-        String workflowId = request.getWorkflowId();
         String imagePath = request.getImagePath();
         String selfieId = request.getSelfieId();
 
-        if (workflowId.isBlank() || imagePath.isBlank() || selfieId.isBlank()) {
+        if (imagePath.isBlank() || selfieId.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
 
-        clearComfyUiService.clearComfyUi(workflowId, imagePath, selfieId);
+        clearComfyUiService.clearComfyUi(imagePath, selfieId);
         return ResponseEntity.ok().build();
     }
 }

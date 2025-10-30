@@ -16,7 +16,6 @@ public class WorkflowStatusApi {
     private final WorkflowStatusService workflowStatusService;
 
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Map<String, String>> getWorkflowStatus(@RequestBody
                                                                  WorkflowStatusRequest workflowStatusRequest) {
         Map<String, String> status = workflowStatusService.getStatus(workflowStatusRequest.getWorkflowId());

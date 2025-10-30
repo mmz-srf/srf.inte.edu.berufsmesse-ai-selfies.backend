@@ -1,8 +1,16 @@
 package srf.inte.edu.berufsmesse.ai.selfies.service;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,13 +18,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
+@RequiredArgsConstructor
 public class ClearComfyUiService {
     private static final Logger log = LoggerFactory.getLogger(ClearComfyUiService.class);
     private static final Path outputDir = Path.of("/Users/sleipnir03/Documents/ComfyUI/output");
     private static final Path inputDir = Path.of("/Users/sleipnir03/Documents/ComfyUI/input");
 
-    public void clearComfyUi(String workflowId, String imagePath, String selfieId) {
-        clearWorkflow(workflowId);
+    private final DocumentProperties documentProperties;
+
+    public void clearComfyUi(String imagePath, String selfieId) {
+        clearWorkflow();
         clearAiImage(imagePath);
         clearUploadImage(selfieId);
     }
@@ -52,7 +63,6 @@ public class ClearComfyUiService {
         }
 
         String filename = Paths.get(imagePath).getFileName().toString();
-
         Path file = outputDir.resolve(filename);
         try {
             boolean deleted = Files.deleteIfExists(file);
@@ -66,12 +76,20 @@ public class ClearComfyUiService {
         }
     }
 
-    // TODO: clear workflow from history via comfyUi endpoint
-    private void clearWorkflow(String workflowId) {
-        // no-op by default; implement if you have workflow-scoped files to remove
-        if (workflowId == null || workflowId.isBlank()) {
-            return;
+    private void clearWorkflow() {
+        String url = documentProperties.getComfyuiUrl() + "/history";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        String body = "{\"clear\": true}";
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+
+        try {
+            restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
+            log.debug("Requested ComfyUI to clear all workflows via {}", url);
+        } catch (RestClientException e) {
+            log.warn("Failed to clear ComfyUI workflows at {}: {}", url, e.toString());
         }
-        log.debug("clearWorkflow called for {}, no filesystem artifacts to remove by default", workflowId);
     }
 }

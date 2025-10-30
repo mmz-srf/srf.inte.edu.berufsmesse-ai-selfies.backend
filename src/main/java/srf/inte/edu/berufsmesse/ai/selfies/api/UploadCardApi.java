@@ -18,7 +18,6 @@ public class UploadCardApi {
     private final UploadS3Service uploadS3Service;
 
     @PostMapping
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Map<String, String>> uploadCard(@RequestBody UploadCardRequest request) {
         return ResponseEntity.ok()
                              .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
