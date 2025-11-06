@@ -24,6 +24,6 @@ public class CreateCardApi {
 
         return ResponseEntity.ok()
                              .contentType(MediaType.APPLICATION_JSON)
-                             .body(Map.of("svg", createCardService.createCard(request)));
+                             .body(Map.of("html", createCardService.createCard(request)));
     }
 }

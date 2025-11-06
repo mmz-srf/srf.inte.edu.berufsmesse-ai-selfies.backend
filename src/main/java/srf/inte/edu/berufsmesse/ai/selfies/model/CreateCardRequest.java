@@ -7,4 +7,5 @@ public class CreateCardRequest {
     private String imagePath;
     private String name;
     private String template;
+    private int age;
 }

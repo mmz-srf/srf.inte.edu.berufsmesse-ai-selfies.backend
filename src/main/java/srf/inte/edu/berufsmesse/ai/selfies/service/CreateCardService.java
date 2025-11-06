@@ -40,9 +40,9 @@ public class CreateCardService {
         byte[] imageBytes = restTemplate.getForObject(url, byte[].class);
         String base64 = Base64.getEncoder().encodeToString(imageBytes);
 
-        String templatePath = "/templates/" + request.getTemplate();
+        String templatePath = "/templates/" + request.getTemplate() + ".html";
 
-        // Load svg template
+        // Load html template
         try (var inputStream = CreateCardService.class.getResourceAsStream(templatePath)) {
             assert inputStream != null;
             var html = replacePlaceholders(new String(inputStream.readAllBytes()), base64, request);
@@ -97,6 +97,7 @@ public class CreateCardService {
         int aura = getRandomAura();
         html = html.replace("{{IMAGE}}", "data:image/png;base64," + base64);
         html = html.replace("{{NAME}}", request.getName());
+        html = html.replace("{{LEVEL", String.valueOf(request.getAge()));
 
         // job
         html = html.replace("{{JOB}}", job.getName());
