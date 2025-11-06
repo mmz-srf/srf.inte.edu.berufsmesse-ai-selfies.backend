@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 public class CardJobsModel {
-    private int id;
     private String name;
     @JsonProperty("font-size")
     private int fontSize;

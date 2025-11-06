@@ -26,32 +26,23 @@ s3:
 
 values:
   jobs:
-    - id: 1
-      name: "Veranstaltungsfachmann/-fachfrau"
+    - name: "Veranstaltungsfachmann/-fachfrau"
       font-size: 30
-    - id: 2
-      name: "Informatiker:in Plattform"
+    - name: "Informatiker:in Plattform"
       font-size: 33
-    - id: 3
-      name: "Informatiker:in Applikation"
+    - name: "Informatiker:in Applikation"
       font-size: 31
-    - id: 4
-      name: "Multimediaelektroniker:in"
+    - name: "Multimediaelektroniker:in"
       font-size: 33
-    - id: 5
-      name: "ICT-Fachmann/Fachfrau"
+    - name: "ICT-Fachmann/Fachfrau"
       font-size: 33
-    - id: 6
-      name: "Fachperson Information und Dokumentation"
+    - name: "Fachperson Information und Dokumentation"
       font-size: 29
-    - id: 7
-      name: "Automobilmechatroniker:in"
+    - name: "Automobilmechatroniker:in"
       font-size: 30
-    - id: 8
-      name: "Mediamatiker:in"
+    - name: "Mediamatiker:in"
       font-size: 33
-    - id: 9
-      name: "Praktikum HMS Kaufmann/Kauffrau"
+    - name: "Praktikum HMS Kaufmann/Kauffrau"
       font-size: 33
 
   superpowers:
