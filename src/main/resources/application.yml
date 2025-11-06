@@ -13,7 +13,7 @@ spring:
 
 
 settings:
-  allowed-templates: [ "mockup.svg", "srf-v1.svg" ]
+  allowed-templates: [ "yellow", "lime", "purple", "aqua" ]
   max-name-length: 20
   comfyui-url: http://192.168.2.1:8188
   prompt-path: "/prompts/anime-ai-v3.json"
