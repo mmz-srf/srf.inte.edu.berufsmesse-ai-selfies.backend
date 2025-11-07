@@ -83,7 +83,14 @@ public class CreateCardService {
         int maxWidth = 242;
 
         double relativePosition = (double) (aura - minAura) / (maxAura - minAura);
-        return (int) (minWidth + relativePosition * (maxWidth - minWidth));
+        int width = (int) (minWidth + relativePosition * (maxWidth - minWidth));
+        if (width < minWidth) {
+            return minWidth;
+        } else if (width > maxWidth) {
+            return maxWidth;
+        } else {
+            return width;
+        }
     }
 
     /**
