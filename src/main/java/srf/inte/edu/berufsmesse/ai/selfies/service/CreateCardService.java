@@ -85,7 +85,9 @@ public class CreateCardService {
         int possibilities = (maxAura - minAura) / cardValueProperties.getAura().getStep();
         int minWidth = 147;
         int maxWidth = 242;
-        return minWidth + (aura * (maxWidth - minWidth)) / possibilities;
+        int width = minWidth + (aura * (maxWidth - minWidth)) / possibilities;
+        log.info("Aura: {}, Width: {}", aura, width);
+        return width;
     }
 
     /**
