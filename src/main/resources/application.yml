@@ -33,7 +33,7 @@ values:
     - name: "Informatiker:in Applikation"
       font-size: 26
     - name: "Multimediaelektroniker:in"
-      font-size: 28
+      font-size: 25
     - name: "ICT-Fachmann/Fachfrau"
       font-size: 28
     - name: "Fachperson Information und Dokumentation"
