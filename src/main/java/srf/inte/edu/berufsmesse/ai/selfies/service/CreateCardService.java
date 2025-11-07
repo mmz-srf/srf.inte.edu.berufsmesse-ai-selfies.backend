@@ -85,7 +85,7 @@ public class CreateCardService {
         int possibilities = (maxAura - minAura) / cardValueProperties.getAura().getStep();
         int minWidth = 147;
         int maxWidth = 242;
-        return minWidth + (aura - minAura) * (maxWidth - minWidth) / possibilities;
+        return minWidth + (aura * (maxWidth - minWidth)) / possibilities;
     }
 
     /**
@@ -97,7 +97,7 @@ public class CreateCardService {
         int aura = getRandomAura();
         html = html.replace("{{IMAGE}}", "data:image/png;base64," + base64);
         html = html.replace("{{NAME}}", request.getName());
-        html = html.replace("{{LEVEL", String.valueOf(request.getAge()));
+        html = html.replace("{{LEVEL}}", String.valueOf(request.getAge()));
 
         // job
         html = html.replace("{{JOB}}", job.getName());
