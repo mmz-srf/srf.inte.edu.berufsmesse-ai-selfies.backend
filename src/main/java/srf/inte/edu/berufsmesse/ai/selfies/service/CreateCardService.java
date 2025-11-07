@@ -42,13 +42,10 @@ public class CreateCardService {
 
         String templatePath = "/templates/" + request.getTemplate() + ".html";
 
-        // Load html template
+        // Load HTML template
         try (var inputStream = CreateCardService.class.getResourceAsStream(templatePath)) {
             assert inputStream != null;
-            var html = replacePlaceholders(new String(inputStream.readAllBytes()), base64, request);
-
-            // TODO: convert html to png and upload to s3 directly, no frontend in between
-            return html;
+            return replacePlaceholders(new String(inputStream.readAllBytes()), base64, request);
         } catch (IOException e) {
             log.error("Failed to load template", e);
             throw new RuntimeException(e);
@@ -86,11 +83,7 @@ public class CreateCardService {
         int maxWidth = 301;
 
         double relativePosition = (double) (aura - minAura) / (maxAura - minAura);
-
-        int width = (int) (minWidth + relativePosition * (maxWidth - minWidth));
-
-        log.info("Aura: {}, RelativePosition: {}, Width: {}", aura, relativePosition, width);
-        return width;
+        return (int) (minWidth + relativePosition * (maxWidth - minWidth));
     }
 
     /**
@@ -107,6 +100,7 @@ public class CreateCardService {
         // job
         html = html.replace("{{JOB}}", job.getName());
         html = html.replace("{{JOB_FONT_SIZE}}", String.valueOf(job.getFontSize()));
+        log.debug("Job: {}", job);
 
         // aura
         html = html.replace("{{AURA}}", String.valueOf(aura));
