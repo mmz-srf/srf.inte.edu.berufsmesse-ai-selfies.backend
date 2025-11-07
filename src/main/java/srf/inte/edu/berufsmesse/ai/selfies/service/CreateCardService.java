@@ -79,8 +79,8 @@ public class CreateCardService {
     private int getAuraWidth(int aura) {
         int minAura = cardValueProperties.getAura().getMin();
         int maxAura = cardValueProperties.getAura().getMax();
-        int minWidth = 47;
-        int maxWidth = 301;
+        int minWidth = 147;
+        int maxWidth = 242;
 
         double relativePosition = (double) (aura - minAura) / (maxAura - minAura);
         return (int) (minWidth + relativePosition * (maxWidth - minWidth));
