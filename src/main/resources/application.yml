@@ -27,23 +27,23 @@ s3:
 values:
   jobs:
     - name: "Veranstaltungsfachmann/-fachfrau"
-      font-size: 30
+      font-size: 25
     - name: "Informatiker:in Plattform"
-      font-size: 33
+      font-size: 28
     - name: "Informatiker:in Applikation"
-      font-size: 31
+      font-size: 26
     - name: "Multimediaelektroniker:in"
-      font-size: 33
+      font-size: 28
     - name: "ICT-Fachmann/Fachfrau"
-      font-size: 33
+      font-size: 28
     - name: "Fachperson Information und Dokumentation"
-      font-size: 29
+      font-size: 24
     - name: "Automobilmechatroniker:in"
-      font-size: 30
+      font-size: 25
     - name: "Mediamatiker:in"
-      font-size: 33
+      font-size: 28
     - name: "Praktikum HMS Kaufmann/Kauffrau"
-      font-size: 33
+      font-size: 28
 
   superpowers:
     - "Stimmungsbombe"
