@@ -31,12 +31,19 @@ public class CardImageService {
         log.info("Creating AI trading card for {}", request.getSelfieId());
 
         // Return workflowId
-        return callComfyUI(request.getSelfieId(), request.getImageBase64());
+        return callComfyUI(request);
     }
 
-    private String callComfyUI(String selfieId, String base64) {
+    private String callComfyUI(CardImageRequest request) {
+
+        // Request parameters
+        String base64 = request.getImageBase64();
+        String selfieId = request.getSelfieId();
+        String hairColor = request.getHairColor();
+        String gender = request.getGender();
+
         String comfyBaseUrl = documentProperties.getComfyuiUrl();
-         String promptPath = documentProperties.getPromptPath();
+        String promptPath = documentProperties.getPromptPath();
         RestTemplate restTemplate = new RestTemplate();
 
         // Request to upload the image to comfyUI
@@ -89,6 +96,8 @@ public class CardImageService {
 
             var prompt = new String(inputStream.readAllBytes());
             prompt = prompt.replace("{{IMAGE}}", workflowImagePath);
+            prompt = prompt.replace("{{HAIR_COLOR}}", hairColor);
+            prompt = prompt.replace("{{GENDER}}", gender);
 
             var response = restTemplate.postForEntity(comfyBaseUrl + "/prompt", new HttpEntity<>(prompt), PromptResponse.class);
             workflowId = Objects.requireNonNull(response.getBody()).getPromptId();
