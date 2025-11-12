@@ -1,16 +1,17 @@
 package srf.inte.edu.berufsmesse.ai.selfies;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.annotation.Value;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.CardValueProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.CreateCardRequest;
@@ -44,9 +45,11 @@ class CreateCardServiceTest {
     private CardValueProperties cardValueProperties;
 
     private CreateCardService service;
+    private List<CardJobsModel> jobs;
 
     @BeforeEach
     void setup() {
+        jobs = cardValueProperties.getJobs();
         when(documentProperties.getAllowedTemplates()).thenReturn(List.of("aqua"));
 
         // Provide aura settings because getAuraWidth reads min/max/step
@@ -122,27 +125,26 @@ class CreateCardServiceTest {
 
     }
 
-    Stream<CardJobsModel> jobsProvider() { return Stream.of(cardJobsModel); }
+    @Test
+    void createCard_testJobLength() throws Exception {
+        for (CardJobsModel job : jobs) {
+            CreateCardRequest request = new CreateCardRequest();
+            request.setAge(13);
+            request.setName("Test Name");
+            request.setTemplate("aqua");
+            request.setImagePath("/ai.png");
 
-    @ParameterizedTest(name = "[{index}] Job: {0}")
-    @MethodSource("jobsProvider")
-    void createCard_testJobLength(CardJobsModel job) throws Exception {
-        CreateCardRequest request = new CreateCardRequest();
-        request.setAge(13);
-        request.setName("Test Name");
-        request.setTemplate("aqua");
-        request.setImagePath("/ai.png");
+            CreateCardService spy = spy(service);
+            doReturn(job).when(spy).getRandomJob();
 
-        CreateCardService spy = spy(service);
-        doReturn(job).when(spy).getRandomJob();
+            String htmlResponse = spy.createCard(request);
+            assertNotNull(htmlResponse);
 
-        String htmlResponse = spy.createCard(request);
-        assertNotNull(htmlResponse);
-
-        Files.createDirectories(Paths.get("target/html-reports"));
-        Files.write(
-                Paths.get("target/html-reports", job.getName() + ".html"),
-                htmlResponse.getBytes(StandardCharsets.UTF_8)
-        );
+            Files.createDirectories(Paths.get("target/html-reports"));
+            Files.write(
+                    Paths.get("target/html-reports", job.getName() + ".html"),
+                    htmlResponse.getBytes(StandardCharsets.UTF_8)
+            );
+        }
     }
 }

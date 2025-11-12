@@ -16,7 +16,7 @@ settings:
   allowed-templates: [ "yellow", "lime", "purple", "aqua" ]
   max-name-length: 20
   comfyui-url: http://192.168.2.1:8188
-  prompt-path: "/prompts/final-workflow.json"
+  prompt-path: "/prompts/final_workflow.json"
 
 s3:
   bucket: "srf-staticfiles-production"
