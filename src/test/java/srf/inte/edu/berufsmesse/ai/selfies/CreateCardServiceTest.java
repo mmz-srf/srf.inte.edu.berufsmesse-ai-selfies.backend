@@ -5,18 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.beans.factory.annotation.Value;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.CardValueProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.CreateCardRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardAura;
 import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardJobsModel;
+import srf.inte.edu.berufsmesse.ai.selfies.models.CreateCardServiceTestModel;
 import srf.inte.edu.berufsmesse.ai.selfies.service.CreateCardService;
 
 import java.io.IOException;
@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -44,23 +43,22 @@ class CreateCardServiceTest {
     @Mock
     private CardValueProperties cardValueProperties;
 
+    private CreateCardServiceTestModel testModel;
     private CreateCardService service;
-    private List<CardJobsModel> jobs;
 
     @BeforeEach
     void setup() {
-        jobs = cardValueProperties.getJobs();
         when(documentProperties.getAllowedTemplates()).thenReturn(List.of("aqua"));
+        testModel = new CreateCardServiceTestModel();
 
-        // Provide aura settings because getAuraWidth reads min/max/step
         CardAura aura = mock(CardAura.class);
         when(aura.getMin()).thenReturn(3000);
         when(aura.getMax()).thenReturn(4000);
         when(aura.getStep()).thenReturn(100);
-        // mark as lenient because tests override getRandomAura and may not call this stub
-        org.mockito.Mockito.lenient().when(cardValueProperties.getAura()).thenReturn(aura);
+        Mockito.lenient().when(cardValueProperties.getAura()).thenReturn(aura);
 
-        when(cardValueProperties.getJobs()).thenReturn(List.of(cardJobsModel));
+        when(cardValueProperties.getJobs()).thenReturn(testModel.getJobs());
+
         when(documentProperties.getMaxNameLength()).thenReturn(100);
 
         service = new CreateCardService(documentProperties, cardValueProperties) {
@@ -127,7 +125,7 @@ class CreateCardServiceTest {
 
     @Test
     void createCard_testJobLength() throws Exception {
-        for (CardJobsModel job : jobs) {
+        for (CardJobsModel job : testModel.getJobs()) {
             CreateCardRequest request = new CreateCardRequest();
             request.setAge(13);
             request.setName("Test Name");
@@ -141,10 +139,13 @@ class CreateCardServiceTest {
             assertNotNull(htmlResponse);
 
             Files.createDirectories(Paths.get("target/html-reports"));
+            String safeName = job.getName().replaceAll("[^a-zA-Z0-9_-]", "_");
+            safeName = safeName.replace("/", "(");
             Files.write(
-                    Paths.get("target/html-reports", job.getName() + ".html"),
+                    Paths.get("target/html-reports", safeName + ".html"),
                     htmlResponse.getBytes(StandardCharsets.UTF_8)
             );
+
         }
     }
 }

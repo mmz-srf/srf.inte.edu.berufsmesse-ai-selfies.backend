@@ -8,4 +8,9 @@ public class CardJobsModel {
     private String name;
     @JsonProperty("font-size")
     private int fontSize;
+
+    public CardJobsModel(String name, int fontSize) {
+        this.name = name;
+        this.fontSize = fontSize;
+    }
 }
