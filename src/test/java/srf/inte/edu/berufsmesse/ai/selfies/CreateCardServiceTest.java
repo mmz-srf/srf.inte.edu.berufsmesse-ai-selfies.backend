@@ -65,9 +65,10 @@ class CreateCardServiceTest {
         when(aura.getStep()).thenReturn(100);
         Mockito.lenient().when(cardValueProperties.getAura()).thenReturn(aura);
 
-        // Return actual list of jobs and icks
+        // Return actual list of jobs, icks and superpowers
         when(cardValueProperties.getJobs()).thenReturn(testModel.getJobs());
         when(cardValueProperties.getIck()).thenReturn(testModel.getIckList());
+        when(cardValueProperties.getSuperpowers()).thenReturn(testModel.getSuperPowers());
 
         when(documentProperties.getMaxNameLength()).thenReturn(100);
 
@@ -136,13 +137,9 @@ class CreateCardServiceTest {
             String htmlResponse = spy.createCard(request);
             assertNotNull(htmlResponse);
 
-            Files.createDirectories(Paths.get("target/html-reports/jobs"));
             String safeName = job.getName().replaceAll("[^a-zA-Z0-9_-]", "_");
             safeName = safeName.replace("/", "-");
-            Files.write(
-                    Paths.get("target/html-reports/jobs", safeName + ".html"),
-                    htmlResponse.getBytes(StandardCharsets.UTF_8)
-            );
+            saveFile("target/html-reports/jobs", safeName, htmlResponse.getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -157,13 +154,29 @@ class CreateCardServiceTest {
             String htmlResponse = spy.createCard(request);
             assertNotNull(htmlResponse);
 
-            Files.createDirectories(Paths.get("target/html-reports/icks"));
-            String fileName = "ick(" + i + ")";
-            Files.write(
-                    Paths.get("target/html-reports/icks", fileName + "html"),
-                    htmlResponse.getBytes(StandardCharsets.UTF_8)
-            );
-
+            saveFile("target/html-reports/icks", "ick(" + i + ")", htmlResponse.getBytes(StandardCharsets.UTF_8));
         }
+    }
+
+    @Test
+    void createCard_testSuperpowerLength() throws Exception {
+        List<String> superPowers = cardValueProperties.getSuperpowers();
+        for (int i = 0; i < superPowers.size(); i++) {
+            String superPower = superPowers.get(i);
+            doReturn(superPower).when(spy).getRandomSuperpower();
+
+            String htmlResponse = spy.createCard(request);
+            assertNotNull(htmlResponse);
+
+            saveFile("target/html-reports/superpowers", "superpower(" + i + ")", htmlResponse.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
+    private void saveFile(String path, String fileName, byte[] data) throws IOException {
+        Files.createDirectories(Paths.get(path));
+        Files.write(
+                Paths.get(path, fileName + "html"),
+                data
+        );
     }
 }
