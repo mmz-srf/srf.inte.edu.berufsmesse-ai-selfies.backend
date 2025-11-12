@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CreateCardServiceTest {
 
     @Mock
@@ -37,9 +36,6 @@ class CreateCardServiceTest {
 
     @Mock
     private CardValueProperties cardValueProperties;
-
-    @Mock
-    private RestTemplate restTemplate;
 
     private CreateCardService service;
 
