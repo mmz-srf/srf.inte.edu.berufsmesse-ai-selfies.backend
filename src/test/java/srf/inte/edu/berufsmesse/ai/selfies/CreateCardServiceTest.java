@@ -1,13 +1,12 @@
 package srf.inte.edu.berufsmesse.ai.selfies;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestTemplate;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.CardValueProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.CreateCardRequest;
@@ -21,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 class CreateCardServiceTest {
 
     @Mock
-    private CardJobsModel cardJobsModel;
+    private static CardJobsModel cardJobsModel;
 
     @Mock
     private DocumentProperties documentProperties;
@@ -45,7 +45,6 @@ class CreateCardServiceTest {
 
         CardAura aura = mock(CardAura.class);
         when(cardValueProperties.getAura()).thenReturn(aura);
-
         when(cardValueProperties.getJobs()).thenReturn(List.of(cardJobsModel));
         when(documentProperties.getMaxNameLength()).thenReturn(100);
 
@@ -65,6 +64,12 @@ class CreateCardServiceTest {
             @Override
             public int getRandomAura() {
                 return 0;
+            }
+
+            @Override
+            public CardJobsModel getRandomJob() {
+                List<CardJobsModel> jobs = cardValueProperties.getJobs();
+                return jobs.get((int) (Math.random() * jobs.size()));
             }
 
             @Override
@@ -95,12 +100,23 @@ class CreateCardServiceTest {
 
         String htmlResponse = service.createCard(request);
         assertNotNull(htmlResponse);
+    }
 
-        File outDir = new File("build/test-output");
-        if (!outDir.exists()) outDir.mkdirs();
-        File outFile = new File(outDir, "card-aura-" + fixedAura + ".html");
-        try (FileOutputStream fos = new FileOutputStream(outFile)) {
-            fos.write(htmlResponse.getBytes(StandardCharsets.UTF_8));
-        }
+    static Stream<CardJobsModel> jobsProvider() { return Stream.of(cardJobsModel); }
+
+    @ParameterizedTest
+    @MethodSource("jobsProvider")
+    void createCard_testJobLength(CardJobsModel job) throws Exception {
+        CreateCardRequest request = new CreateCardRequest();
+        request.setAge(13);
+        request.setName("Test Name");
+        request.setTemplate("aqua");
+        request.setImagePath("/ai.png");
+
+        CreateCardService spy = spy(service);
+        doReturn(job).when(spy).getRandomJob();
+
+        String htmlResponse = spy.createCard(request);
+        assertNotNull(htmlResponse);
     }
 }
