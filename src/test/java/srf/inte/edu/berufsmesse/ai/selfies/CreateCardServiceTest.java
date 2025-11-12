@@ -50,7 +50,6 @@ class CreateCardServiceTest {
     @BeforeEach
     void setup() {
         when(documentProperties.getAllowedTemplates()).thenReturn(List.of("aqua"));
-        testModel = new CreateCardServiceTestModel();
 
         // Default request
         request = new CreateCardRequest();
@@ -66,6 +65,7 @@ class CreateCardServiceTest {
         Mockito.lenient().when(cardValueProperties.getAura()).thenReturn(aura);
 
         // Return actual list of jobs, icks and superpowers
+        testModel = new CreateCardServiceTestModel();
         when(cardValueProperties.getJobs()).thenReturn(testModel.getJobs());
         when(cardValueProperties.getIck()).thenReturn(testModel.getIckList());
         when(cardValueProperties.getSuperpowers()).thenReturn(testModel.getSuperPowers());
@@ -84,36 +84,12 @@ class CreateCardServiceTest {
                     throw new RuntimeException(e);
                 }
             }
-
-            @Override
-            public int getRandomAura() {
-                return 0;
-            }
-
-            @Override
-            public CardJobsModel getRandomJob() {
-                List<CardJobsModel> jobs = cardValueProperties.getJobs();
-                return jobs.get((int) (Math.random() * jobs.size()));
-            }
-
-            @Override
-            public String getRandomSuperpower() {
-                return "Superpower";
-            }
-
-            @Override
-            public String getRandomIck() {
-                return "Ick";
-            }
         };
 
         spy = spy(service);
-
-        when(cardJobsModel.getName()).thenReturn("Test Job");
-        when(cardJobsModel.getFontSize()).thenReturn(12);
     }
 
-    @ParameterizedTest(name = "[{index}] Fixed Aura: {0}")
+    @ParameterizedTest
     @ValueSource(ints = { 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000 })
     void createCards_withFixedAura_writesHtmlForInspection(int fixedAura) throws IOException {
         doReturn(fixedAura).when(spy).getRandomAura();
@@ -126,7 +102,6 @@ class CreateCardServiceTest {
                 Paths.get("target/html-reports/aura", fixedAura + ".html"),
                 htmlResponse.getBytes(StandardCharsets.UTF_8)
         );
-
     }
 
     @Test
@@ -146,7 +121,6 @@ class CreateCardServiceTest {
     @Test
     void createCard_testIckLength() throws Exception {
         List<String> ick = cardValueProperties.getIck();
-        System.out.println(ick.size());
         for (int i = 0; i < ick.size(); i++) {
             String ickString = ick.get(i);
             doReturn(ickString).when(spy).getRandomIck();
