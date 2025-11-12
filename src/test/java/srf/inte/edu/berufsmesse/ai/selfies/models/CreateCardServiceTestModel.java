@@ -18,6 +18,45 @@ public class CreateCardServiceTestModel {
     );
 
     private final List<String> ickList = List.of(
+            "Fährt mit Helm und Rucksack Fahrrad.",
+            "Rennt einem Ball hinterher, der weggerollt ist.",
+            "Winkt jemandem, der gar nicht zurückwinkt.",
+            "Versucht, durch eine Drehtür zu gehen, aber erwischt den falschen Moment.",
+            "Klatscht aus Versehen zu früh beim Applaus.",
+            "Ruft laut 'Tschüss!' und niemand antwortet.",
+            "Fängt bei einem Song zu früh an zu singen.",
+            "Fällt fast hin und tut so, als wäre nix passiert.",
+            "Rennt einem Bus hinterher und der Bus fährt trotzdem weg.",
+            "Versucht, elegant in eine Hängematte zu steigen und scheitert.",
+            "Bleibt mit dem Rucksack an einer Türklinke hängen.",
+            "Ruft im Laden laut nach jemandem und merkt, dass es die falsche Person ist.",
+            "Zieht an einer Tür, auf der 'Drücken' steht.",
+            "Rudert beim Trampolinspringen komisch mit den Armen.",
+            "Trägt Flip-Flops mit Socken.",
+            "Wirft einen Ball und trifft das Ziel so gar nicht.",
+            "Trägt eine Sonnenbrille, wenn die Sonne gar nicht scheint.",
+            "Singt beim Song mit, kennt aber den Text nicht richtig.",
+            "Ruft 'Hallo?' beim Videocall, obwohl das Mikro aus ist.",
+            "Sagt 'Tschüss' und geht dann in dieselbe Richtung wie die andere Person.",
+            "Steckt die Hände in die Jackentasche und trifft sie nicht.",
+            "Will den Reissverschluss der Jacke schliessen, trifft aber nicht.",
+            "Ruft laut 'Tschau!' und stolpert direkt danach.",
+            "Streicht sich durch die Haare, bleibt aber hängen.",
+            "Sagt 'Tschüss' und bleibt dann aber stehen.",
+            "Stolpert über die eigenen Schnürsenkel.",
+            "Hebt die Hand im Unterricht und weiss dann nicht mehr, was man sagen wollte.",
+            "Sagt der Lehrperson aus Versehen 'Mama' oder 'Papa'.",
+            "Lacht allein über einen Witz, den niemand verstanden hat.",
+            "Nimmt beim Trinken zu viel und verschluckt sich.",
+            "Sagt im Restaurant 'Gleichfalls', wenn der Kellner 'Guten Appetit' sagt.",
+            "Tippt jemandem auf die Schulter, aber es ist die falsche Person.",
+            "Ruft im Sportunterricht 'Ich hab ihn!' zum Ball und verfehlt ihn komplett.",
+            "Läuft gegen eine Glastür, weil sie zu sauber ist.",
+            "Streckt die Hand aus, wenn die andere Person dich eigentlich umarmen wollte.",
+            "Versucht, einen High Five zu geben, und die andere Person lässt dich hängen."
+    );
+
+    private final List<String> superPowers = List.of(
             "Stimmungsbombe",
             "Macher:in",
             "Alpha fe:male",
@@ -49,5 +88,9 @@ public class CreateCardServiceTestModel {
 
     public List<String> getIckList() {
         return ickList;
+    }
+
+    public List<String> getSuperPowers() {
+        return superPowers;
     }
 }
