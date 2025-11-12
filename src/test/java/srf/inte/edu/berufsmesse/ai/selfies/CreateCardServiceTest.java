@@ -45,11 +45,19 @@ class CreateCardServiceTest {
 
     private CreateCardServiceTestModel testModel;
     private CreateCardService service;
+    private  CreateCardRequest request;
 
     @BeforeEach
     void setup() {
         when(documentProperties.getAllowedTemplates()).thenReturn(List.of("aqua"));
         testModel = new CreateCardServiceTestModel();
+
+        // Default request
+        request = new CreateCardRequest();
+        request.setAge(13);
+        request.setName("Test Name");
+        request.setTemplate("aqua");
+        request.setImagePath("/ai.png");
 
         CardAura aura = mock(CardAura.class);
         when(aura.getMin()).thenReturn(3000);
@@ -103,12 +111,6 @@ class CreateCardServiceTest {
     @ParameterizedTest(name = "[{index}] Fixed Aura: {0}")
     @ValueSource(ints = { 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000 })
     void createCards_withFixedAura_writesHtmlForInspection(int fixedAura) throws IOException {
-        CreateCardRequest request = new CreateCardRequest();
-        request.setAge(13);
-        request.setName("Test Name");
-        request.setTemplate("aqua");
-        request.setImagePath("/ai.png");
-
         CreateCardService spy = spy(service);
         doReturn(fixedAura).when(spy).getRandomAura();
 
@@ -126,12 +128,6 @@ class CreateCardServiceTest {
     @Test
     void createCard_testJobLength() throws Exception {
         for (CardJobsModel job : testModel.getJobs()) {
-            CreateCardRequest request = new CreateCardRequest();
-            request.setAge(13);
-            request.setName("Test Name");
-            request.setTemplate("aqua");
-            request.setImagePath("/ai.png");
-
             CreateCardService spy = spy(service);
             doReturn(job).when(spy).getRandomJob();
 
