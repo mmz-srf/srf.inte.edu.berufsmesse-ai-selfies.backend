@@ -24,7 +24,6 @@ public class CreateCardService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String createCard(CreateCardRequest request) {
-        String comfyBaseUrl = documentProperties.getComfyuiUrl();
         List<String> validTemplates = documentProperties.getAllowedTemplates();
         int maxNameLength = documentProperties.getMaxNameLength();
         // Validate request
@@ -36,9 +35,7 @@ public class CreateCardService {
         }
 
         // Get comfyUI image as base64
-        String url = comfyBaseUrl + "/view?filename=" + request.getImagePath() + "&type=output";
-        byte[] imageBytes = restTemplate.getForObject(url, byte[].class);
-        String base64 = Base64.getEncoder().encodeToString(imageBytes);
+        String base64 = getComfyUiImage(request.getImagePath(), documentProperties.getComfyuiUrl());
 
         String templatePath = "/templates/" + request.getTemplate() + ".html";
 
@@ -52,12 +49,18 @@ public class CreateCardService {
         }
     }
 
-    private CardJobsModel getRandomJob() {
+    public String getComfyUiImage(String imagePath, String comfyBaseUrl) {
+        String url = comfyBaseUrl + "/view?filename=" + imagePath + "&type=output";
+        byte[] imageBytes = restTemplate.getForObject(url, byte[].class);
+        return Base64.getEncoder().encodeToString(imageBytes);
+    }
+
+    public CardJobsModel getRandomJob() {
         List<CardJobsModel> jobs = cardValueProperties.getJobs();
         return jobs.get((int) (Math.random() * jobs.size()));
     }
 
-    private int getRandomAura() {
+    public int getRandomAura() {
         CardAura auraSettings = cardValueProperties.getAura();
         int min = auraSettings.getMin();
         int max = auraSettings.getMax();
@@ -66,12 +69,12 @@ public class CreateCardService {
         return (int) ((Math.random() * (max - min)) + min) / step * step;
     }
 
-    private String getRandomSuperpower() {
+    public String getRandomSuperpower() {
         List<String> superpowers = cardValueProperties.getSuperpowers();
         return superpowers.get((int) (Math.random() * superpowers.size()));
     }
 
-    private String getRandomIck() {
+    public String getRandomIck() {
         List<String> ick = cardValueProperties.getIck();
         return ick.get((int) (Math.random() * ick.size()));
     }
