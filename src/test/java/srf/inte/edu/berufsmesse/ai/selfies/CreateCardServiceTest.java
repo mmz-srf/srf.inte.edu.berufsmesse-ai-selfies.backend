@@ -19,6 +19,9 @@ import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardJobsModel;
 import srf.inte.edu.berufsmesse.ai.selfies.service.CreateCardService;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Stream;
@@ -110,6 +113,10 @@ class CreateCardServiceTest {
 
         String htmlResponse = spy.createCard(request);
         assertNotNull(htmlResponse);
+
+        Files.createDirectories(Paths.get("target"));
+        Files.write(Paths.get("target/html-reports" + fixedAura + ".html"), htmlResponse.getBytes(StandardCharsets.UTF_8));
+
     }
 
     Stream<CardJobsModel> jobsProvider() { return Stream.of(cardJobsModel); }
@@ -128,5 +135,9 @@ class CreateCardServiceTest {
 
         String htmlResponse = spy.createCard(request);
         assertNotNull(htmlResponse);
+
+        Files.createDirectories(Paths.get("target"));
+        Files.write(Paths.get("target/html-reports" + job.getName() + ".html"), htmlResponse.getBytes(StandardCharsets.UTF_8));
+
     }
 }
