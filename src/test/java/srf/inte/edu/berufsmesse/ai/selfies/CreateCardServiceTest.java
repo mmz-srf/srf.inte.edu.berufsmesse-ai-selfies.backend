@@ -44,8 +44,8 @@ class CreateCardServiceTest {
     private CardValueProperties cardValueProperties;
 
     private CreateCardServiceTestModel testModel;
-    private CreateCardService service;
     private  CreateCardRequest request;
+    private CreateCardService spy;
 
     @BeforeEach
     void setup() {
@@ -65,11 +65,13 @@ class CreateCardServiceTest {
         when(aura.getStep()).thenReturn(100);
         Mockito.lenient().when(cardValueProperties.getAura()).thenReturn(aura);
 
+        // Return actual list of jobs and icks
         when(cardValueProperties.getJobs()).thenReturn(testModel.getJobs());
+        when(cardValueProperties.getIck()).thenReturn(testModel.getIckList());
 
         when(documentProperties.getMaxNameLength()).thenReturn(100);
 
-        service = new CreateCardService(documentProperties, cardValueProperties) {
+        CreateCardService service = new CreateCardService(documentProperties, cardValueProperties) {
             @Override
             public String getComfyUiImage(String imagePath, String comfyBaseUrl) {
                 // Load AI dummy image as base64
@@ -104,6 +106,8 @@ class CreateCardServiceTest {
             }
         };
 
+        spy = spy(service);
+
         when(cardJobsModel.getName()).thenReturn("Test Job");
         when(cardJobsModel.getFontSize()).thenReturn(12);
     }
@@ -111,15 +115,14 @@ class CreateCardServiceTest {
     @ParameterizedTest(name = "[{index}] Fixed Aura: {0}")
     @ValueSource(ints = { 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000 })
     void createCards_withFixedAura_writesHtmlForInspection(int fixedAura) throws IOException {
-        CreateCardService spy = spy(service);
         doReturn(fixedAura).when(spy).getRandomAura();
 
         String htmlResponse = spy.createCard(request);
         assertNotNull(htmlResponse);
 
-        Files.createDirectories(Paths.get("target/html-reports"));
+        Files.createDirectories(Paths.get("target/html-reports/aura"));
         Files.write(
-                Paths.get("target/html-reports", fixedAura + ".html"),
+                Paths.get("target/html-reports/aura", fixedAura + ".html"),
                 htmlResponse.getBytes(StandardCharsets.UTF_8)
         );
 
@@ -128,17 +131,36 @@ class CreateCardServiceTest {
     @Test
     void createCard_testJobLength() throws Exception {
         for (CardJobsModel job : testModel.getJobs()) {
-            CreateCardService spy = spy(service);
             doReturn(job).when(spy).getRandomJob();
 
             String htmlResponse = spy.createCard(request);
             assertNotNull(htmlResponse);
 
-            Files.createDirectories(Paths.get("target/html-reports"));
+            Files.createDirectories(Paths.get("target/html-reports/jobs"));
             String safeName = job.getName().replaceAll("[^a-zA-Z0-9_-]", "_");
-            safeName = safeName.replace("/", "(");
+            safeName = safeName.replace("/", "-");
             Files.write(
-                    Paths.get("target/html-reports", safeName + ".html"),
+                    Paths.get("target/html-reports/jobs", safeName + ".html"),
+                    htmlResponse.getBytes(StandardCharsets.UTF_8)
+            );
+        }
+    }
+
+    @Test
+    void createCard_testIckLength() throws Exception {
+        List<String> ick = cardValueProperties.getIck();
+        System.out.println(ick.size());
+        for (int i = 0; i < ick.size(); i++) {
+            String ickString = ick.get(i);
+            doReturn(ickString).when(spy).getRandomIck();
+
+            String htmlResponse = spy.createCard(request);
+            assertNotNull(htmlResponse);
+
+            Files.createDirectories(Paths.get("target/html-reports/icks"));
+            String fileName = "ick(" + i + ")";
+            Files.write(
+                    Paths.get("target/html-reports/icks", fileName + "html"),
                     htmlResponse.getBytes(StandardCharsets.UTF_8)
             );
 
