@@ -114,8 +114,11 @@ class CreateCardServiceTest {
         String htmlResponse = spy.createCard(request);
         assertNotNull(htmlResponse);
 
-        Files.createDirectories(Paths.get("target"));
-        Files.write(Paths.get("target/html-reports" + fixedAura + ".html"), htmlResponse.getBytes(StandardCharsets.UTF_8));
+        Files.createDirectories(Paths.get("target/html-reports"));
+        Files.write(
+                Paths.get("target/html-reports", fixedAura + ".html"),
+                htmlResponse.getBytes(StandardCharsets.UTF_8)
+        );
 
     }
 
@@ -136,8 +139,10 @@ class CreateCardServiceTest {
         String htmlResponse = spy.createCard(request);
         assertNotNull(htmlResponse);
 
-        Files.createDirectories(Paths.get("target"));
-        Files.write(Paths.get("target/html-reports" + job.getName() + ".html"), htmlResponse.getBytes(StandardCharsets.UTF_8));
-
+        Files.createDirectories(Paths.get("target/html-reports"));
+        Files.write(
+                Paths.get("target/html-reports", job.getName() + ".html"),
+                htmlResponse.getBytes(StandardCharsets.UTF_8)
+        );
     }
 }
