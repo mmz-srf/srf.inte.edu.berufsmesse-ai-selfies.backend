@@ -42,7 +42,7 @@
     },
     "6":{
       "inputs":{
-        "text":"anime-style, portrait",
+        "text":"anime-style, portrait, {{HAIR_COLOR}} hair, {{GENDER}} person, portrait, looking into the camera, keep face structure and hair style, HD, best quality",
         "clip":[
           "4",
           1
@@ -113,8 +113,8 @@
     },
     "27":{
       "inputs":{
-        "width":650,
-        "height":420,
+        "width":628,
+        "height":466,
         "interpolation":"nearest",
         "method":"keep proportion",
         "condition":"always",
@@ -131,8 +131,8 @@
     },
     "28":{
       "inputs":{
-        "width":650,
-        "height":420,
+        "width":628,
+        "height":466,
         "interpolation":"nearest",
         "method":"stretch",
         "condition":"always",
@@ -401,7 +401,7 @@
               "Node name for S&R":"CLIPTextEncode"
             },
             "widgets_values":[
-              "realistic, photorealistic, 3d, lowres, blurry, disfigured, ugly, deformed"
+              "realistic, photorealistic, 3d, low resolution, blurry, disfigured, ugly, deformed, text, distorted face"
             ]
           },
           {
@@ -495,8 +495,8 @@
               "Node name for S&R":"ImageResize+"
             },
             "widgets_values":[
-              650,
-              420,
+              628,
+              466,
               "nearest",
               "stretch",
               "always",
@@ -549,8 +549,8 @@
               "Node name for S&R":"ImageResize+"
             },
             "widgets_values":[
-              650,
-              420,
+              628,
+              466,
               "nearest",
               "keep proportion",
               "downscale if bigger",
