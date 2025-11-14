@@ -18,6 +18,7 @@ import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardAura;
 import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardJobsModel;
 import srf.inte.edu.berufsmesse.ai.selfies.models.CreateCardServiceTestModel;
 import srf.inte.edu.berufsmesse.ai.selfies.service.CreateCardService;
+import srf.inte.edu.berufsmesse.ai.selfies.service.StatisticsService;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -42,6 +43,9 @@ class CreateCardServiceTest {
 
     @Mock
     private CardValueProperties cardValueProperties;
+
+    @Mock
+    private StatisticsService statisticsService;
 
     private CreateCardServiceTestModel testModel;
     private  CreateCardRequest request;
@@ -72,7 +76,7 @@ class CreateCardServiceTest {
 
         when(documentProperties.getMaxNameLength()).thenReturn(100);
 
-        CreateCardService service = new CreateCardService(documentProperties, cardValueProperties) {
+        CreateCardService service = new CreateCardService(documentProperties, cardValueProperties, statisticsService) {
             @Override
             public String getComfyUiImage(String imagePath, String comfyBaseUrl) {
                 // Load AI dummy image as base64
