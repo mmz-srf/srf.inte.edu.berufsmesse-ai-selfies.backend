@@ -104,7 +104,9 @@ public class CreateCardService {
         CardJobsModel job = getRandomJob();
         int aura = getRandomAura();
         html = html.replace("{{IMAGE}}", "data:image/png;base64," + base64);
-        html = html.replace("{{NAME}}", request.getName());
+
+        String serializedName = request.getName().replace("<", "").replace(">", "");
+        html = html.replace("{{NAME}}", serializedName);
         html = html.replace("{{LEVEL}}", String.valueOf(request.getAge()));
 
         // job
