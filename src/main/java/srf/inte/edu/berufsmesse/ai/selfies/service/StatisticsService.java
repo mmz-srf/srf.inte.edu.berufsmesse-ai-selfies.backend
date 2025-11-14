@@ -34,7 +34,7 @@ public class StatisticsService {
             Statistics stats = loadStatistics();
             stats.getTemplates().merge(templateName, 1, Integer::sum);
             saveStatistics(stats);
-            log.debug("Increased template '{}' to {}", templateName, stats.getTemplates().get(templateName));
+            log.info("Increased template '{}' to {}", templateName, stats.getTemplates().get(templateName));
         } catch (IOException e) {
             log.error("Failed to increase template counter for {}", templateName, e);
         }
@@ -45,7 +45,7 @@ public class StatisticsService {
             Statistics stats = loadStatistics();
             stats.getGender().merge(gender, 1, Integer::sum);
             saveStatistics(stats);
-            log.debug("Increased gender '{}' to {}", gender, stats.getGender().get(gender));
+            log.info("Increased gender '{}' to {}", gender, stats.getGender().get(gender));
         } catch (IOException e) {
             log.error("Failed to increase gender counter for {}", gender, e);
         }
