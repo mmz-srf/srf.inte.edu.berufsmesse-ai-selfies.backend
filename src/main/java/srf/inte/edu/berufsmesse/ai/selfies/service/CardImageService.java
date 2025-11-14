@@ -26,6 +26,7 @@ import java.util.*;
 public class CardImageService {
 
     private final DocumentProperties documentProperties;
+    private final StatisticsService statisticsService;
 
     public String createCard(CardImageRequest request) {
         log.info("Creating AI trading card for {}", request.getSelfieId());
@@ -98,6 +99,9 @@ public class CardImageService {
             prompt = prompt.replace("{{IMAGE}}", workflowImagePath);
             prompt = prompt.replace("{{HAIR_COLOR}}", hairColor);
             prompt = prompt.replace("{{GENDER}}", gender);
+
+            statisticsService.increaseGender(gender);
+            statisticsService.increaseRequests();
 
             var response = restTemplate.postForEntity(comfyBaseUrl + "/prompt", new HttpEntity<>(prompt), PromptResponse.class);
             workflowId = Objects.requireNonNull(response.getBody()).getPromptId();

@@ -22,6 +22,7 @@ public class CreateCardService {
     private final DocumentProperties documentProperties;
     private final CardValueProperties cardValueProperties;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final StatisticsService statisticsService;
 
     public String createCard(CreateCardRequest request) {
         List<String> validTemplates = documentProperties.getAllowedTemplates();
@@ -37,6 +38,7 @@ public class CreateCardService {
         // Get comfyUI image as base64
         String base64 = getComfyUiImage(request.getImagePath(), documentProperties.getComfyuiUrl());
 
+        statisticsService.increaseTemplates(request.getTemplate());
         String templatePath = "/templates/" + request.getTemplate() + ".html";
 
         // Load HTML template
