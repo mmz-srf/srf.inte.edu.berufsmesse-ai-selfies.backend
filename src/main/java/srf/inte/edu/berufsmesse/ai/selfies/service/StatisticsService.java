@@ -1,7 +1,6 @@
 package srf.inte.edu.berufsmesse.ai.selfies.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import srf.inte.edu.berufsmesse.ai.selfies.model.Statistics;
@@ -12,18 +11,28 @@ import java.io.InputStream;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class StatisticsService {
 
     private final ObjectMapper objectMapper;
     private static final String STATS_FILE_PATH = "src/main/resources/statistics/stats.json";
+
+    public StatisticsService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+        File statsFile = new File(STATS_FILE_PATH);
+        log.info("=================================================");
+        log.info("Statistics file location: {}", statsFile.getAbsolutePath());
+        log.info("File exists: {}", statsFile.exists());
+        log.info("File writable: {}", statsFile.canWrite());
+        log.info("Working directory: {}", System.getProperty("user.dir"));
+        log.info("=================================================");
+    }
 
     public synchronized void increaseRequests() {
         try {
             Statistics stats = loadStatistics();
             stats.setTotalRequests(stats.getTotalRequests() + 1);
             saveStatistics(stats);
-            log.debug("Increased total requests to {}", stats.getTotalRequests());
+            log.info("✓ Increased total requests to {}", stats.getTotalRequests());
         } catch (IOException e) {
             log.error("Failed to increase requests counter", e);
         }
@@ -34,7 +43,7 @@ public class StatisticsService {
             Statistics stats = loadStatistics();
             stats.getTemplates().merge(templateName, 1, Integer::sum);
             saveStatistics(stats);
-            log.debug("Increased template '{}' to {}", templateName, stats.getTemplates().get(templateName));
+            log.info("Increased template '{}' to {}", templateName, stats.getTemplates().get(templateName));
         } catch (IOException e) {
             log.error("Failed to increase template counter for {}", templateName, e);
         }
@@ -45,7 +54,7 @@ public class StatisticsService {
             Statistics stats = loadStatistics();
             stats.getGender().merge(gender, 1, Integer::sum);
             saveStatistics(stats);
-            log.debug("Increased gender '{}' to {}", gender, stats.getGender().get(gender));
+            log.info("Increased gender '{}' to {}", gender, stats.getGender().get(gender));
         } catch (IOException e) {
             log.error("Failed to increase gender counter for {}", gender, e);
         }
@@ -70,9 +79,11 @@ public class StatisticsService {
         File statsFile = new File(STATS_FILE_PATH);
         // Ensure parent directory exists
         if (!statsFile.getParentFile().exists()) {
-            statsFile.getParentFile().mkdirs();
+            boolean created = statsFile.getParentFile().mkdirs();
+            log.info("Created parent directory: {} (success: {})", statsFile.getParentFile(), created);
         }
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(statsFile, stats);
+        log.info("Saved statistics to: {}", statsFile.getAbsolutePath());
     }
 
     public Statistics getStatistics() {
