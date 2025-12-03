@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.sonarqube") version "7.1.0.6387"
 }
 
 group = "srf.inte.edu.berufsmesse"
@@ -39,4 +40,13 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+sonarqube {
+    properties {
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.organization", "mmz-srf")
+        property("sonar.projectKey", "mmz-srf_srf.inte.edu.berufsmesse-ai-selfies.backend")
+        property("sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.file("jacoco.xml").get().asFile.path)
+    }
 }
