@@ -26,6 +26,11 @@ jobs:
       - name: Run tests
         run: ./gradlew test --no-daemon
 
+      - name: Sonar
+        run: ./gradlew sonar --daemon
+        env:
+          SONAR_TOKEN: ${{ secrets.EDU_SONAR_TOKEN }}
+
       - name: Upload all HTML reports as artifact
         uses: actions/upload-artifact@v4
         with:
