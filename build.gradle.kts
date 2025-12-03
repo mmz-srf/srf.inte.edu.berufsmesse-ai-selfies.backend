@@ -28,14 +28,14 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.apache.xmlgraphics:batik-transcoder:1.19")
+    implementation("org.apache.xmlgraphics:batik-codec:1.19")
+    implementation("software.amazon.awssdk:s3:2.35.6")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation("org.apache.xmlgraphics:batik-transcoder:1.19")
-    implementation("org.apache.xmlgraphics:batik-codec:1.19")
-    implementation("software.amazon.awssdk:s3:2.35.6")
 }
 
 tasks.withType<Test> {
