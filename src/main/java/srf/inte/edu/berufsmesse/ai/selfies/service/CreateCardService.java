@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.CardValueProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
-import srf.inte.edu.berufsmesse.ai.selfies.model.CreateCardRequest;
+import srf.inte.edu.berufsmesse.ai.selfies.model.request.CreateCardRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardAura;
 import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardJobsModel;
 
@@ -22,7 +22,6 @@ public class CreateCardService {
     private final DocumentProperties documentProperties;
     private final CardValueProperties cardValueProperties;
     private final RestTemplate restTemplate = new RestTemplate();
-    private final StatisticsService statisticsService;
 
     public String createCard(CreateCardRequest request) {
         List<String> validTemplates = documentProperties.getAllowedTemplates();
@@ -37,8 +36,6 @@ public class CreateCardService {
 
         // Get comfyUI image as base64
         String base64 = getComfyUiImage(request.getImagePath(), documentProperties.getComfyuiUrl());
-
-        statisticsService.increaseTemplates(request.getTemplate());
         String templatePath = "/templates/" + request.getTemplate() + ".html";
 
         // Load HTML template

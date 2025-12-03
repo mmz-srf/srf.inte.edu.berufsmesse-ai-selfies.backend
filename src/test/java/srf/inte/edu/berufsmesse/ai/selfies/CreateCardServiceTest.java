@@ -13,12 +13,11 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.CardValueProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
-import srf.inte.edu.berufsmesse.ai.selfies.model.CreateCardRequest;
+import srf.inte.edu.berufsmesse.ai.selfies.model.request.CreateCardRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardAura;
 import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardJobsModel;
 import srf.inte.edu.berufsmesse.ai.selfies.models.CreateCardServiceTestModel;
 import srf.inte.edu.berufsmesse.ai.selfies.service.CreateCardService;
-import srf.inte.edu.berufsmesse.ai.selfies.service.StatisticsService;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -43,9 +42,6 @@ class CreateCardServiceTest {
 
     @Mock
     private CardValueProperties cardValueProperties;
-
-    @Mock
-    private StatisticsService statisticsService;
 
     private CreateCardServiceTestModel testModel;
     private  CreateCardRequest request;
@@ -76,12 +72,12 @@ class CreateCardServiceTest {
 
         when(documentProperties.getMaxNameLength()).thenReturn(100);
 
-        CreateCardService service = new CreateCardService(documentProperties, cardValueProperties, statisticsService) {
+        CreateCardService service = new CreateCardService(documentProperties, cardValueProperties) {
             @Override
             public String getComfyUiImage(String imagePath, String comfyBaseUrl) {
                 // Load AI dummy image as base64
                 try (var inputStream = CreateCardService.class.getResourceAsStream("/ai.png")) {
-                    assert inputStream != null;
+                    assertNotNull(inputStream);
                     byte[] imageBytes = inputStream.readAllBytes();
                     return Base64.getEncoder().encodeToString(imageBytes);
                 } catch (IOException e) {
@@ -153,7 +149,7 @@ class CreateCardServiceTest {
     private void saveFile(String path, String fileName, byte[] data) throws IOException {
         Files.createDirectories(Paths.get(path));
         Files.write(
-                Paths.get(path, fileName + "html"),
+                Paths.get(path, fileName + ".html"),
                 data
         );
     }

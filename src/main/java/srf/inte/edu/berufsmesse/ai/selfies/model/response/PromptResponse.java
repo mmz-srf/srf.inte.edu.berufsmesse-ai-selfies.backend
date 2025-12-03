@@ -1,4 +1,4 @@
-package srf.inte.edu.berufsmesse.ai.selfies.model;
+package srf.inte.edu.berufsmesse.ai.selfies.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

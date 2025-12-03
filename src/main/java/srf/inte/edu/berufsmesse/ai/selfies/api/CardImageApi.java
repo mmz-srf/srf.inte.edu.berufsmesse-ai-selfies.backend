@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import srf.inte.edu.berufsmesse.ai.selfies.model.CardImageRequest;
+import srf.inte.edu.berufsmesse.ai.selfies.model.request.CardImageRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.service.CardImageService;
 
 import java.util.HashMap;

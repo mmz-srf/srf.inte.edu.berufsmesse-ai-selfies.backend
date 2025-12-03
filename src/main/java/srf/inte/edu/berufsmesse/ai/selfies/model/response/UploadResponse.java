@@ -1,4 +1,4 @@
-package srf.inte.edu.berufsmesse.ai.selfies.model;
+package srf.inte.edu.berufsmesse.ai.selfies.model.response;
 
 import lombok.Data;
 
