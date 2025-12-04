@@ -48,6 +48,6 @@ public class UploadS3Service {
         s3.putObject(request, RequestBody.fromBytes(image));
         s3.close();
 
-        return "https://www.srf.ch/staticfiles/berufsmesse/ki-pics/" + name;
+        return s3Properties.getUrl() + name;
     }
 }

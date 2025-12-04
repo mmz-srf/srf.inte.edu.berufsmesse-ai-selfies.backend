@@ -12,6 +12,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import srf.inte.edu.berufsmesse.ai.selfies.configuration.ComfyUiProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.response.PromptResponse;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.CardImageRequest;
@@ -26,6 +27,7 @@ import java.util.*;
 public class CardImageService {
 
     private final DocumentProperties documentProperties;
+    private final ComfyUiProperties comfyUiProperties;
 
     public String createCard(CardImageRequest request) {
         log.info("Creating AI trading card for {}", request.getSelfieId());
@@ -42,7 +44,7 @@ public class CardImageService {
         String hairColor = request.getHairColor();
         String gender = request.getGender();
 
-        String comfyBaseUrl = documentProperties.getComfyuiUrl();
+        String comfyBaseUrl = comfyUiProperties.getUrl();
         String promptPath = documentProperties.getPromptPath();
         RestTemplate restTemplate = new RestTemplate();
 

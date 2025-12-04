@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import srf.inte.edu.berufsmesse.ai.selfies.configuration.ComfyUiProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.response.QueueResponse;
 
@@ -17,9 +18,10 @@ public class WorkflowStatusService {
 
     private final DocumentProperties documentProperties;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ComfyUiProperties comfyUiProperties;
 
     public Map<String, String> getStatus(String workflowId) {
-        String comfyBaseUrl = documentProperties.getComfyuiUrl();
+        String comfyBaseUrl = comfyUiProperties.getUrl();
         String statusUrl = comfyBaseUrl + "/history/" + workflowId;
         String queueUrl = comfyBaseUrl + "/queue";
 
@@ -84,7 +86,7 @@ public class WorkflowStatusService {
             }
 
             result.put("status", "unknown");
-            result.put("message", "Workflow is not part if the response body");
+            result.put("message", "Workflow is not part of the response body");
             return result;
 
         } catch (Exception e) {
