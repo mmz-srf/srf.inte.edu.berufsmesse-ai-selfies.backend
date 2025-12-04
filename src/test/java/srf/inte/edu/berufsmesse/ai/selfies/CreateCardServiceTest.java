@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.CardValueProperties;
+import srf.inte.edu.berufsmesse.ai.selfies.configuration.ComfyUiProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.CreateCardRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.model.cards.CardAura;
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.*;
 class CreateCardServiceTest {
 
     @Mock
-    private CardJobsModel cardJobsModel;
+    private ComfyUiProperties comfyUiProperties;
 
     @Mock
     private DocumentProperties documentProperties;
@@ -72,7 +73,7 @@ class CreateCardServiceTest {
 
         when(documentProperties.getMaxNameLength()).thenReturn(100);
 
-        CreateCardService service = new CreateCardService(documentProperties, cardValueProperties) {
+        CreateCardService service = new CreateCardService(documentProperties, cardValueProperties, comfyUiProperties) {
             @Override
             public String getComfyUiImage(String imagePath, String comfyBaseUrl) {
                 // Load AI dummy image as base64

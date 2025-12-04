@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import srf.inte.edu.berufsmesse.ai.selfies.configuration.ComfyUiProperties;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.DocumentProperties;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.nio.file.Paths;
 public class ClearComfyUiService {
     private final Logger log = LoggerFactory.getLogger(ClearComfyUiService.class);
     private final DocumentProperties properties;
+    private final ComfyUiProperties comfyUiProperties;
 
     public void clearComfyUi(String imagePath, String selfieId) {
         clearWorkflow();
@@ -40,7 +42,7 @@ public class ClearComfyUiService {
             filename = filename + ".png";
         }
 
-        Path file = Path.of(properties.getComfyUiProperties().getInputDir()).resolve(filename);
+        Path file = Path.of(comfyUiProperties.getInputDir()).resolve(filename);
         try {
             boolean deleted = Files.deleteIfExists(file);
             if (deleted) {
@@ -60,7 +62,7 @@ public class ClearComfyUiService {
         }
 
         String filename = Paths.get(imagePath).getFileName().toString();
-        Path file = Path.of(properties.getComfyUiProperties().getOutputDir()).resolve(filename);
+        Path file = Path.of(comfyUiProperties.getOutputDir()).resolve(filename);
         try {
             boolean deleted = Files.deleteIfExists(file);
             if (deleted) {
@@ -74,7 +76,7 @@ public class ClearComfyUiService {
     }
 
     private void clearWorkflow() {
-        String url = properties.getComfyUiProperties().getUrl() + "/history";
+        String url = comfyUiProperties.getUrl() + "/history";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
