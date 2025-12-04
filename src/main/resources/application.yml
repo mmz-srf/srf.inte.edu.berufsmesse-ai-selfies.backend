@@ -17,8 +17,13 @@ settings:
   max-name-length: 20
   comfyui-url: http://192.168.2.1:8188
   prompt-path: "/prompts/anime-ai-v3.json"
+  comfyui:
+    url: http://192.168.2.1:8188
+    output-dir: "/Users/sleipnir03/Documents/ComfyUI/output"
+    input-dir: "/Users/sleipnir03/Documents/ComfyUI/input"
 
 s3:
+  url: "https://www.srf.ch/staticfiles/berufsmesse/ki-pics/"
   bucket: "srf-staticfiles-production"
   user-path: "berufsmesse/ki-pics/"
   access-key: ${AWS_ACCESS_KEY_ID}

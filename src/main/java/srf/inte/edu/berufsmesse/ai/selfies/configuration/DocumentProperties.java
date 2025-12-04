@@ -12,6 +12,6 @@ import java.util.List;
 public class DocumentProperties {
     private List<String> allowedTemplates;
     private int maxNameLength;
-    private String comfyuiUrl;
+    private ComfyUiProperties comfyUiProperties;
     private String promptPath;
 }

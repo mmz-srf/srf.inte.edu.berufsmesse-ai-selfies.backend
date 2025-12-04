@@ -19,7 +19,7 @@ public class WorkflowStatusService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public Map<String, String> getStatus(String workflowId) {
-        String comfyBaseUrl = documentProperties.getComfyuiUrl();
+        String comfyBaseUrl = documentProperties.getComfyUiProperties().getUrl();
         String statusUrl = comfyBaseUrl + "/history/" + workflowId;
         String queueUrl = comfyBaseUrl + "/queue";
 
@@ -84,7 +84,7 @@ public class WorkflowStatusService {
             }
 
             result.put("status", "unknown");
-            result.put("message", "Workflow is not part if the response body");
+            result.put("message", "Workflow is not part of the response body");
             return result;
 
         } catch (Exception e) {

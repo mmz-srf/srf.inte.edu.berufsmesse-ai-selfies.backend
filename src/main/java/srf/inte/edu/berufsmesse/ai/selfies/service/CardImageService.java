@@ -42,7 +42,7 @@ public class CardImageService {
         String hairColor = request.getHairColor();
         String gender = request.getGender();
 
-        String comfyBaseUrl = documentProperties.getComfyuiUrl();
+        String comfyBaseUrl = documentProperties.getComfyUiProperties().getUrl();
         String promptPath = documentProperties.getPromptPath();
         RestTemplate restTemplate = new RestTemplate();
 

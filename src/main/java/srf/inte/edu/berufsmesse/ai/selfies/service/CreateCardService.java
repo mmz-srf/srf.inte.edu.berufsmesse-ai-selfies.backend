@@ -35,7 +35,7 @@ public class CreateCardService {
         }
 
         // Get comfyUI image as base64
-        String base64 = getComfyUiImage(request.getImagePath(), documentProperties.getComfyuiUrl());
+        String base64 = getComfyUiImage(request.getImagePath(), documentProperties.getComfyUiProperties().getUrl());
         String templatePath = "/templates/" + request.getTemplate() + ".html";
 
         // Load HTML template

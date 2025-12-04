@@ -20,11 +20,8 @@ import java.nio.file.Paths;
 @Service
 @RequiredArgsConstructor
 public class ClearComfyUiService {
-    private static final Logger log = LoggerFactory.getLogger(ClearComfyUiService.class);
-    private static final Path outputDir = Path.of("/Users/sleipnir03/Documents/ComfyUI/output");
-    private static final Path inputDir = Path.of("/Users/sleipnir03/Documents/ComfyUI/input");
-
-    private final DocumentProperties documentProperties;
+    private final Logger log = LoggerFactory.getLogger(ClearComfyUiService.class);
+    private final DocumentProperties properties;
 
     public void clearComfyUi(String imagePath, String selfieId) {
         clearWorkflow();
@@ -43,7 +40,7 @@ public class ClearComfyUiService {
             filename = filename + ".png";
         }
 
-        Path file = inputDir.resolve(filename);
+        Path file = Path.of(properties.getComfyUiProperties().getInputDir()).resolve(filename);
         try {
             boolean deleted = Files.deleteIfExists(file);
             if (deleted) {
@@ -63,7 +60,7 @@ public class ClearComfyUiService {
         }
 
         String filename = Paths.get(imagePath).getFileName().toString();
-        Path file = outputDir.resolve(filename);
+        Path file = Path.of(properties.getComfyUiProperties().getOutputDir()).resolve(filename);
         try {
             boolean deleted = Files.deleteIfExists(file);
             if (deleted) {
@@ -77,7 +74,7 @@ public class ClearComfyUiService {
     }
 
     private void clearWorkflow() {
-        String url = documentProperties.getComfyuiUrl() + "/history";
+        String url = properties.getComfyUiProperties().getUrl() + "/history";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
