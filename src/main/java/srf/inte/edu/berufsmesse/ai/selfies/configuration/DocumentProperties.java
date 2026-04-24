@@ -10,7 +10,5 @@ import java.util.List;
 @ConfigurationProperties(prefix = "settings")
 @Data
 public class DocumentProperties {
-    private List<String> allowedTemplates;
     private int maxNameLength;
-    private String promptPath;
 }
