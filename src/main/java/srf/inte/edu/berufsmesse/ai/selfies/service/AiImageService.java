@@ -30,6 +30,9 @@ public class AiImageService {
     }
 
     private String generateImage(String inputImageBase64) {
+
+        log.info("Generating image at {}", aiConfiguration.getUrl());
+
         try {
             var client = HttpClient.newHttpClient();
             var boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW";
@@ -59,7 +62,12 @@ public class AiImageService {
                                      .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
                                      .build();
 
+            log.info("Wrote request body, sending request...");
+
             var response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+            log.info("Received response with status code: {}", response.statusCode());
+
             return Base64.getEncoder().encodeToString(response.body());
         } catch (IOException e) {
             log.error("Error generating image: {}", e.getMessage());
