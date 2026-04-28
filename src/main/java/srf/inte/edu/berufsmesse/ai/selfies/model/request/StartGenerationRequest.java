@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class StartGenerationRequest {
     private String gender;
+    private String name;
     private String background;
     private String image;
-    private String identifier;
 }

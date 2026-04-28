@@ -4,6 +4,5 @@ import lombok.Data;
 
 @Data
 public class GenerationCompleteResponse {
-    private String identifier;
-    private String image;
+    private String image; // image in base64
 }

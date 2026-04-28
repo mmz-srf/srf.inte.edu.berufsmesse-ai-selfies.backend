@@ -30,9 +30,3 @@ jobs:
         run: ./gradlew sonar --daemon
         env:
           SONAR_TOKEN: ${{ secrets.EDU_SONAR_TOKEN }}
-
-      - name: Upload all HTML reports as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: html-reports
-          path: target/html-reports/

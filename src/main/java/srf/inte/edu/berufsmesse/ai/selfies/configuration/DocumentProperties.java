@@ -1,14 +1,12 @@
 package srf.inte.edu.berufsmesse.ai.selfies.configuration;
 
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @ConfigurationProperties(prefix = "settings")
-@Data
+@Getter
 public class DocumentProperties {
     private int maxNameLength;
 }
