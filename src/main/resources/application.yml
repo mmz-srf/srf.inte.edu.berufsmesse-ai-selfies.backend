@@ -13,5 +13,7 @@ s3:
   secret-key: ${AWS_SECRET_ACCESS_KEY}
 
 ai-config:
-  url: "http://ec2-63-181-117-242.eu-central-1.compute.amazonaws.com:8080/generate"
+  url: "http://ec2-63-182-192-6.eu-central-1.compute.amazonaws.com:8080/generate"
   examplePrompt: "Change only the persons clothing to a navy blue suit with long arms (jacket and trousers) with a crisp white dress shirt and a solid dark tie. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The Person should remain upright."
+  connectTimeout: 10s
+  requestTimeout: 180s
