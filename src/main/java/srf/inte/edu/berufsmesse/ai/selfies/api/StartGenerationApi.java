@@ -17,7 +17,7 @@ public class StartGenerationApi {
 
     @PostMapping
     public ResponseEntity<Void> createCardImage(@RequestBody StartGenerationRequest request) {
-        log.info("Received request: {}", request);
+        log.info("Received request for background {}", request.getBackground());
         aiImageService.createImage(request);
         return ResponseEntity.ok(null);
     }
