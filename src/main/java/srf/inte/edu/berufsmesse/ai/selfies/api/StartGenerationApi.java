@@ -2,10 +2,13 @@ package srf.inte.edu.berufsmesse.ai.selfies.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.StartGenerationRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.service.AiImageService;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/card-image")
@@ -16,9 +19,12 @@ public class StartGenerationApi {
     private final AiImageService aiImageService;
 
     @PostMapping
-    public ResponseEntity<Void> createCardImage(@RequestBody StartGenerationRequest request) {
+    public ResponseEntity<Map<String, String>> createCardImage(@RequestBody StartGenerationRequest request) {
         log.info("Received request for background {}", request.getBackground());
-        aiImageService.createImage(request);
-        return ResponseEntity.ok(null);
+        String base64OutputImage = aiImageService.createImage(request);
+        return new ResponseEntity<>(
+                Map.of("image", base64OutputImage),
+                HttpStatus.OK
+        );
     }
 }
