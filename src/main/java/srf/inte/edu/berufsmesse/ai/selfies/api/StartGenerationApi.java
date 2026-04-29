@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.StartGenerationRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.service.AiImageService;
+import srf.inte.edu.berufsmesse.ai.selfies.service.UploadS3Service;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/card-image")
@@ -17,6 +22,7 @@ import java.util.Map;
 public class StartGenerationApi {
 
     private final AiImageService aiImageService;
+    private final UploadS3Service uploadS3Service;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> createCardImage(@RequestBody StartGenerationRequest request) {
@@ -29,8 +35,14 @@ public class StartGenerationApi {
                     HttpStatus.BAD_GATEWAY
             );
         }
+
+        var imageUrl = uploadS3Service.upload(base64OutputImage, UUID.randomUUID().toString());
+
         return new ResponseEntity<>(
-                Map.of("image", base64OutputImage),
+                Map.of(
+                        "image", base64OutputImage,
+                        "url", imageUrl
+                ),
                 HttpStatus.OK
         );
     }
