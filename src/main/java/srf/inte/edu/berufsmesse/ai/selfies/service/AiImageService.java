@@ -3,6 +3,7 @@ package srf.inte.edu.berufsmesse.ai.selfies.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import srf.inte.edu.berufsmesse.ai.selfies.api.StartGenerationApi;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.AiConfiguration;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.StartGenerationRequest;
 
@@ -27,14 +28,16 @@ public class AiImageService {
     private final AiConfiguration aiConfiguration;
 
     public String createImage(StartGenerationRequest request) {
-        var personImage = generateImage(request.getImage());
+        var personImage = generateImage(request);
+        log.info("Generated image of size {} bytes", personImage != null ? Base64.getDecoder().decode(personImage).length : "null");
 
         return personImage;
     }
 
-    private String generateImage(String inputImageBase64) {
+    private String generateImage(StartGenerationRequest userRequest) {
 
         log.info("Generating image at {}", aiConfiguration.getUrl());
+        var promptConfig = aiConfiguration.getPrompt(userRequest.getGender(), userRequest.getBackground());
 
         try {
             var client = HttpClient.newBuilder()
@@ -42,17 +45,31 @@ public class AiImageService {
                                    .build();
             var boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW";
             var body = new ByteArrayOutputStream();
-            var prompt = aiConfiguration.getExamplePrompt() + "\r\n";
+            var prompt = promptConfig.getPrompt() + "\r\n";
 
+            // prompt
             body.write(("--" + boundary + "\r\n").getBytes());
             body.write("Content-Disposition: form-data; name=\"prompt\"\r\n\r\n".getBytes());
             body.write(prompt.getBytes());
 
+            // seed
+            body.write(("--" + boundary + "\r\n").getBytes());
+            body.write("Content-Disposition: form-data; name=\"seed\"\r\n\r\n".getBytes());
+            body.write(String.valueOf(promptConfig.getSeed()).getBytes());
+            body.write("\r\n".getBytes());
+
+            // steps
+            body.write(("--" + boundary + "\r\n").getBytes());
+            body.write("Content-Disposition: form-data; name=\"num_inference_steps\"\r\n\r\n".getBytes());
+            body.write(String.valueOf(promptConfig.getSteps()).getBytes());
+            body.write("\r\n".getBytes());
+
+            // image
             body.write(("--" + boundary + "\r\n").getBytes());
             body.write("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpeg\"\r\n".getBytes());
             body.write("Content-Type: image/jpeg\r\n\r\n".getBytes());
 
-            byte[] imageBytes = Base64.getDecoder().decode(inputImageBase64);
+            byte[] imageBytes = Base64.getDecoder().decode(userRequest.getImage());
             InputStream imageStream = new ByteArrayInputStream(imageBytes);
             imageStream.transferTo(body);
 
@@ -86,7 +103,7 @@ public class AiImageService {
 
             return Base64.getEncoder().encodeToString(response.body());
         } catch (IOException e) {
-            log.error("Error generating image: {}", e.getMessage());
+            log.error("Error generating image", e);
             return null;
         } catch (IllegalArgumentException e) {
             log.error("Invalid base64 input image: {}", e.getMessage());
