@@ -22,8 +22,8 @@ public class StartGenerationApi {
     public ResponseEntity<Map<String, String>> createCardImage(@RequestBody StartGenerationRequest request) {
         log.info("Received request for background {}", request.getBackground());
         String base64OutputImage = aiImageService.createImage(request);
-        if (base64OutputImage == null) {
-            log.error("Image generation returned null, returning 502");
+        if (base64OutputImage == null || base64OutputImage.isBlank()) {
+            log.error("Image generation returned empty result, returning 502");
             return new ResponseEntity<>(
                     Map.of("error", "Image generation failed. The AI service may be unavailable."),
                     HttpStatus.BAD_GATEWAY
