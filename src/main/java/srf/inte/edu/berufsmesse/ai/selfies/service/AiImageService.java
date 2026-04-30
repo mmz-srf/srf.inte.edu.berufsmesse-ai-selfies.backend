@@ -362,8 +362,8 @@ public class AiImageService {
         int red = c.getRed();
         int blue = c.getBlue();
 
-        return green > 120 &&
-               green > red * 1.3 &&
-               green > blue * 1.3;
+        return green > 100 &&
+               green > red * 1.1 &&
+               green > blue * 1.1;
     }
 }
