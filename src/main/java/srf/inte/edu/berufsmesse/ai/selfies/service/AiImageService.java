@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -33,19 +34,27 @@ public class AiImageService {
 
     private final AiConfiguration aiConfiguration;
     private final LocationOffsetConfiguration locationOffsetConfiguration;
-    private final UploadS3Service uploadS3Service;
 
     public String createImage(StartGenerationRequest request) {
+
+        // image of the captured person with AI adjustments
         var personImage = generateImage(request);
         if (personImage == null || personImage.isBlank()) {
             log.error("Generated person image is empty");
             return null;
         }
-        var greenscreenImage = replaceGreenscreen(request, personImage);
-        var overlayImage = addOverlay(greenscreenImage, request.getBackground());
-        log.info("Generated image of size {} bytes", overlayImage != null ? Base64.getDecoder().decode(overlayImage).length : "null");
 
-        return overlayImage;
+        // person in front of the background with greenscreen removed
+        var greenscreenImage = replaceGreenscreen(request, personImage);
+
+        // image with overlayed objects over the person
+        var overlayImage = addOverlay(greenscreenImage, request.getBackground());
+
+        // the final image with a text overlay displaying the name
+        var textOverlayImage = addTextOverlay(overlayImage, request);
+
+        log.info("Generated image of size {} bytes", textOverlayImage != null ? Base64.getDecoder().decode(textOverlayImage).length : "null");
+        return textOverlayImage;
     }
 
     private String generateImage(StartGenerationRequest userRequest) {
@@ -158,6 +167,54 @@ public class AiImageService {
         } catch (IllegalArgumentException ex) {
             log.error("Invalid base64 input for greenscreen replacement", ex);
             return null;
+        }
+    }
+
+    private String addTextOverlay(String base64Image, StartGenerationRequest request) {
+        var classloader = Thread.currentThread().getContextClassLoader();
+
+        String textOverlaySvg;
+        try (InputStream textOverlayStream = classloader.getResourceAsStream(getOverlayImagePath(request.getBackground()) + "/text_overlay.svg")) {
+            if (textOverlayStream == null) {
+                log.error("Text overlay SVG not found for background {}", request.getBackground());
+                return base64Image;
+            }
+            textOverlaySvg = new String(textOverlayStream.readAllBytes(), StandardCharsets.UTF_8);
+            textOverlaySvg = textOverlaySvg.replace("VORNAME", request.getName());
+            textOverlaySvg = textOverlaySvg.replace("Vorname", request.getName());
+        } catch (IOException ex) {
+            log.error("Error reading text overlay SVG from resources", ex);
+            return base64Image;
+        }
+
+        var client = HttpClient.newBuilder()
+                               .connectTimeout(Duration.ofSeconds(5))
+                               .build();
+        var requestHttp = HttpRequest.newBuilder()
+                                     .uri(URI.create("http://localhost:3000/api/html2png"))
+                                     .timeout(Duration.ofSeconds(10))
+                                     .header("Content-Type", "application/json")
+                                     .POST(HttpRequest.BodyPublishers.ofString("{\"html\": \"" + textOverlaySvg.replace("\n", "") + "\"}"))
+                                     .build();
+
+        try {
+            var response = client.send(requestHttp, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                log.error("Text overlay generation failed with status {} and body: {}", response.statusCode(), response.body());
+                return base64Image;
+            }
+            var textOverlayBase64 = response.body();
+
+            return mergeImages(
+                    base64ToBufferedImage(textOverlayBase64),
+                    Objects.requireNonNull(base64ToBufferedImage(base64Image)),
+                    0,
+                    0,
+                    false
+            );
+        } catch (IOException | InterruptedException ex) {
+            log.error("Error generating text overlay image", ex);
+            return base64Image;
         }
     }
 
