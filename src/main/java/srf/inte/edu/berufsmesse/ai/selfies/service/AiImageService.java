@@ -212,8 +212,11 @@ public class AiImageService {
                     0,
                     false
             );
-        } catch (IOException | InterruptedException ex) {
+        } catch (IOException ex) {
             log.error("Error generating text overlay image", ex);
+            return base64Image;
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread().interrupt();
             return base64Image;
         }
     }
