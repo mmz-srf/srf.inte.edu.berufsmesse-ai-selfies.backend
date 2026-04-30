@@ -28,6 +28,9 @@ import java.util.Base64;
 @Slf4j
 public class AiImageService {
 
+    // Keep background sharper than foreground, but cap extreme resolution gaps.
+    private static final double MAX_BACKGROUND_TO_FOREGROUND_SCALE = 2.5;
+
     private final AiConfiguration aiConfiguration;
     private final LocationOffsetConfiguration locationOffsetConfiguration;
     private final UploadS3Service uploadS3Service;
@@ -39,9 +42,10 @@ public class AiImageService {
             return null;
         }
         var greenscreenImage = replaceGreenscreen(request, personImage);
-        log.info("Generated image of size {} bytes", greenscreenImage != null ? Base64.getDecoder().decode(greenscreenImage).length : "null");
+        var overlayImage = addOverlay(greenscreenImage, request.getBackground());
+        log.info("Generated image of size {} bytes", overlayImage != null ? Base64.getDecoder().decode(overlayImage).length : "null");
 
-        return greenscreenImage;
+        return overlayImage;
     }
 
     private String generateImage(StartGenerationRequest userRequest) {
@@ -135,75 +139,162 @@ public class AiImageService {
                 return null;
             }
 
-            var foregroundImageBytes = Base64.getDecoder().decode(imageBase64);
-            var foreground = ImageIO.read(new ByteArrayInputStream(foregroundImageBytes));
-            if (foreground == null) {
-                log.error("Could not decode foreground image bytes");
+            var foreground = base64ToBufferedImage(imageBase64);
+            var background = readImageFromResources(getBackgroundImagePath(request.getBackground()));
+
+            if (background == null || foreground == null) {
+                log.error("Failed to read background or foreground image for greenscreen replacement");
                 return null;
             }
 
-            var classloader = Thread.currentThread().getContextClassLoader();
-            var backgroundPath = getBackgroundImagePath(request.getBackground());
-            var backgroundStream = classloader.getResourceAsStream(backgroundPath);
-            if (backgroundStream == null) {
-                log.error("Background image not found at {}", backgroundPath);
-                return null;
-            }
-            var background = ImageIO.read(backgroundStream);
-            if (background == null) {
-                log.error("Could not decode background image from {}", backgroundPath);
-                return null;
-            }
+            var scaledBackground = downscaleBackgroundIfNeeded(background, foreground);
 
-            BufferedImage result = new BufferedImage(
-                    foreground.getWidth(),
-                    foreground.getHeight(),
-                    BufferedImage.TYPE_INT_ARGB
+            log.info("Composited image dimensions: foreground={}x{}, background={}x{}",
+                     foreground.getWidth(), foreground.getHeight(),
+                     scaledBackground.getWidth(), scaledBackground.getHeight()
             );
 
-            for (int y = 0; y < foreground.getHeight(); y++) {
-                for (int x = 0; x < foreground.getWidth(); x++) {
-
-                    Color fgColor = new Color(foreground.getRGB(x, y));
-
-                    if (isGreen(fgColor)) {
-
-                        int bgX = x + offset.getX();
-                        int bgY = y + offset.getY();
-
-                        if (bgX >= 0 && bgY >= 0 &&
-                            bgX < background.getWidth() &&
-                            bgY < background.getHeight()) {
-
-                            result.setRGB(x, y, background.getRGB(bgX, bgY));
-                        } else {
-                            result.setRGB(x, y, 0); // transparent
-                        }
-
-                    } else {
-                        result.setRGB(x, y, fgColor.getRGB());
-                    }
-                }
-            }
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            boolean written = ImageIO.write(result, "png", baos);
-            if (!written || baos.size() == 0) {
-                log.error("Could not encode result image. written={}, size={} bytes", written, baos.size());
-                return null;
-            }
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
-        } catch (IOException ex) {
-            log.error("Error reading greenscreen image to bytes", ex);
-            return null;
+            return mergeImages(foreground, scaledBackground, offset.getX(), offset.getY(), true);
         } catch (IllegalArgumentException ex) {
             log.error("Invalid base64 input for greenscreen replacement", ex);
             return null;
         }
     }
 
+    private BufferedImage downscaleBackgroundIfNeeded(BufferedImage background, BufferedImage foreground) {
+        int maxAllowedWidth = (int) Math.round(foreground.getWidth() * MAX_BACKGROUND_TO_FOREGROUND_SCALE);
+        int maxAllowedHeight = (int) Math.round(foreground.getHeight() * MAX_BACKGROUND_TO_FOREGROUND_SCALE);
+
+        if (background.getWidth() <= maxAllowedWidth && background.getHeight() <= maxAllowedHeight) {
+            return background;
+        }
+
+        double widthScale = (double) maxAllowedWidth / background.getWidth();
+        double heightScale = (double) maxAllowedHeight / background.getHeight();
+        double scale = Math.min(widthScale, heightScale);
+
+        int targetWidth = Math.max(1, (int) Math.round(background.getWidth() * scale));
+        int targetHeight = Math.max(1, (int) Math.round(background.getHeight() * scale));
+
+        BufferedImage resized = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = resized.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.drawImage(background, 0, 0, targetWidth, targetHeight, null);
+        g.dispose();
+
+        log.info("Downscaled background from {}x{} to {}x{}", background.getWidth(), background.getHeight(), targetWidth, targetHeight);
+        return resized;
+    }
+
+    private String addOverlay(String base64Image, String backgroundImage) {
+        if (backgroundImage.equals("Radio")) return base64Image; // Radio has no overlay
+
+        BufferedImage overlay = readImageFromResources(getOverlayImagePath(backgroundImage));
+        BufferedImage background = base64ToBufferedImage(base64Image);
+
+        if (overlay == null || background == null) {
+            log.error("Failed to read overlay or background image for overlay");
+            return null;
+        }
+
+        return mergeImages(overlay, background, 0, 0, false);
+    }
+
+    /**
+     * Merges a foreground image onto a background image at the specified offsets. If replaceGreenscreen is true, only pixels in the foreground that are considered green (based on the isGreen method) will replace the background pixels. If false, all non-green pixels in the foreground will replace the background.
+     * @param foreground The foreground image to be merged onto the background.
+     * @param background The background image to which the foreground will be merged.
+     * @param xOffset The horizontal offset at which to start merging the foreground image.
+     * @param yOffset The vertical offset at which to start merging the foreground image.
+     * @param replaceGreenscreen If true, only pixels in the foreground that are considered green (based on the isGreen method) will replace the background pixels. If false, all non-green pixels in the foreground will replace the background.
+     * @return Base64-encoded merged image.
+     */
+    private String mergeImages(BufferedImage foreground, BufferedImage background, int xOffset, int yOffset, boolean replaceGreenscreen) {
+        BufferedImage result = new BufferedImage(
+                background.getWidth(),
+                background.getHeight(),
+                BufferedImage.TYPE_INT_ARGB
+        );
+
+        Graphics2D g = result.createGraphics();
+        g.drawImage(background, 0, 0, null);
+        g.dispose();
+
+        for (int y = 0; y < background.getHeight(); y++) {
+            for (int x = 0; x < background.getWidth(); x++) {
+                int fgX = x - xOffset;
+                int fgY = y - yOffset;
+
+                if (fgX >= 0 && fgY >= 0 && fgX < foreground.getWidth() && fgY < foreground.getHeight()) {
+                    Color fgColor = new Color(foreground.getRGB(fgX, fgY));
+                    if (!replaceGreenscreen || isGreen(fgColor)) {
+                        result.setRGB(x, y, fgColor.getRGB());
+                    }
+                    if (!isGreen(fgColor)) {
+                        result.setRGB(x, y, fgColor.getRGB());
+                    }
+                }
+            }
+        }
+
+        return convertBufferedImageToBase64(result);
+    }
+
+    private String convertBufferedImageToBase64(BufferedImage image) {
+        try {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            boolean written = ImageIO.write(image, "png", output);
+            if (!written || output.size() == 0) {
+                log.error("Could not encode result image. written={}, size={} bytes", written, output.size());
+                return null;
+            }
+            return Base64.getEncoder().encodeToString(output.toByteArray());
+        } catch (IOException ex) {
+            log.error("Error writing result image", ex);
+        }
+        return null;
+    }
+
+    private BufferedImage readImageFromResources(String path) {
+        var classloader = Thread.currentThread().getContextClassLoader();
+        BufferedImage image;
+
+        try (InputStream imageStream = classloader.getResourceAsStream(path)) {
+            if (imageStream == null) {
+                log.error("Image not found at {}", path);
+                return null;
+            }
+            image = ImageIO.read(imageStream);
+            if (image == null) {
+                log.error("Could not decode image from {}", path);
+                return null;
+            }
+        } catch (IOException ex) {
+            log.error("Error reading image from resources", ex);
+            return null;
+        }
+
+        return image;
+    }
+
     private String getBackgroundImagePath(String background) {
         return String.format("images/%s/%s.jpg", background, background);
+    }
+
+    private String getOverlayImagePath(String background) {
+        return String.format("images/%s/overlay.png", background);
+    }
+
+    private BufferedImage base64ToBufferedImage(String base64Image) {
+        try {
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            return ImageIO.read(new ByteArrayInputStream(imageBytes));
+        } catch (IOException ex) {
+            log.error("Error decoding base64 image", ex);
+            return null;
+        }
     }
 
     private static boolean isGreen(Color c) {

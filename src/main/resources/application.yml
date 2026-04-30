@@ -29,8 +29,8 @@ location-offset:
       x: 0
       y: 0
     Meteo:
-      x: 0
-      y: 0
+      x: 680
+      y: -120
     Radio:
       x: 0
       y: 0
