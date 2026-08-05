@@ -263,12 +263,12 @@ public class AiImageService {
     }
 
     /**
-     * Merges a foreground image onto a background image at the specified offsets. If replaceGreenscreen is true, only pixels in the foreground that are considered green (based on the isGreen method) will replace the background pixels. If false, all non-green pixels in the foreground will replace the background.
+     * Merges a foreground image onto a background image at the specified offsets. If replaceGreenscreen is true, foreground pixels considered green (based on the isGreen method) are treated as transparent and the background shows through instead. If false, the foreground is alpha-composited onto the background using its real alpha channel (used for the prop/table overlay and the text caption, both of which are PNGs with transparent areas).
      * @param foreground The foreground image to be merged onto the background.
      * @param background The background image to which the foreground will be merged.
      * @param xOffset The horizontal offset at which to start merging the foreground image.
      * @param yOffset The vertical offset at which to start merging the foreground image.
-     * @param replaceGreenscreen If true, only pixels in the foreground that are considered green (based on the isGreen method) will replace the background pixels. If false, all non-green pixels in the foreground will replace the background.
+     * @param replaceGreenscreen If true, green foreground pixels are skipped so the background shows through instead of the green screen. If false, the foreground's alpha channel is respected.
      * @return Base64-encoded merged image.
      */
     private String mergeImages(BufferedImage foreground, BufferedImage background, int xOffset, int yOffset, boolean replaceGreenscreen) {
@@ -288,18 +288,46 @@ public class AiImageService {
                 int fgY = y - yOffset;
 
                 if (fgX >= 0 && fgY >= 0 && fgX < foreground.getWidth() && fgY < foreground.getHeight()) {
-                    Color fgColor = new Color(foreground.getRGB(fgX, fgY));
-                    if (!replaceGreenscreen || isGreen(fgColor)) {
-                        result.setRGB(x, y, fgColor.getRGB());
-                    }
-                    if (!isGreen(fgColor)) {
-                        result.setRGB(x, y, fgColor.getRGB());
+                    Color fgColor = new Color(foreground.getRGB(fgX, fgY), true);
+
+                    if (replaceGreenscreen) {
+                        if (!isGreen(fgColor)) {
+                            result.setRGB(x, y, 0xFF000000 | fgColor.getRGB());
+                        }
+                        // green foreground pixel: leave the background pixel already drawn in place
+                    } else if (fgColor.getAlpha() > 0) {
+                        int blended = alphaBlend(fgColor, new Color(result.getRGB(x, y), true));
+                        result.setRGB(x, y, blended);
                     }
                 }
             }
         }
 
         return convertBufferedImageToBase64(result);
+    }
+
+    /**
+     * Alpha-composites a (possibly semi-transparent) foreground color over an opaque/semi-transparent background color, "over" operator.
+     */
+    private static int alphaBlend(Color fg, Color bg) {
+        if (fg.getAlpha() >= 255) {
+            return 0xFF000000 | fg.getRGB();
+        }
+
+        double fgA = fg.getAlpha() / 255.0;
+        double bgA = bg.getAlpha() / 255.0;
+        double outA = fgA + bgA * (1 - fgA);
+
+        if (outA <= 0) {
+            return 0;
+        }
+
+        int r = (int) Math.round((fg.getRed() * fgA + bg.getRed() * bgA * (1 - fgA)) / outA);
+        int gr = (int) Math.round((fg.getGreen() * fgA + bg.getGreen() * bgA * (1 - fgA)) / outA);
+        int b = (int) Math.round((fg.getBlue() * fgA + bg.getBlue() * bgA * (1 - fgA)) / outA);
+        int a = (int) Math.round(outA * 255);
+
+        return new Color(r, gr, b, a).getRGB();
     }
 
     private String convertBufferedImageToBase64(BufferedImage image) {
