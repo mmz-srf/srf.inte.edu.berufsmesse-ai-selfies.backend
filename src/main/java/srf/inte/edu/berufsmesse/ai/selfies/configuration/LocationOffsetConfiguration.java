@@ -33,5 +33,6 @@ public class LocationOffsetConfiguration {
     public static class Offset {
         private int x = 0;
         private int y = 0;
+        private double scale = 1.0;
     }
 }
