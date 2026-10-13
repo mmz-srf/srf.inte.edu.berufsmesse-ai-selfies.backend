@@ -1,8 +1,10 @@
 package srf.inte.edu.berufsmesse.ai.selfies.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.AiConfiguration;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.LocationOffsetConfiguration;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.StartGenerationRequest;
@@ -22,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Map;
 import java.util.Objects;
 
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class AiImageService {
 
     private final AiConfiguration aiConfiguration;
     private final LocationOffsetConfiguration locationOffsetConfiguration;
+    private final ObjectMapper objectMapper;
 
     public String createImage(StartGenerationRequest request) {
 
@@ -178,36 +182,47 @@ public class AiImageService {
         var classloader = Thread.currentThread().getContextClassLoader();
 
         String textOverlaySvg;
-        try (InputStream textOverlayStream = classloader.getResourceAsStream(getOverlayImagePath(request.getBackground()) + "/text_overlay.svg")) {
+        var overlayPath = getTextOverlayPath(request.getBackground());
+        log.info("Getting text overlay from {}", classloader.getResource(overlayPath));
+
+        try (InputStream textOverlayStream = classloader.getResourceAsStream(overlayPath)) {
             if (textOverlayStream == null) {
                 log.error("Text overlay SVG not found for background {}", request.getBackground());
                 return base64Image;
             }
             textOverlaySvg = new String(textOverlayStream.readAllBytes(), StandardCharsets.UTF_8);
-            textOverlaySvg = textOverlaySvg.replace("VORNAME", request.getName());
-            textOverlaySvg = textOverlaySvg.replace("Vorname", request.getName());
+            var escapedName = HtmlUtils.htmlEscape(request.getName());
+            textOverlaySvg = textOverlaySvg.replace("VORNAME", escapedName);
+            textOverlaySvg = textOverlaySvg.replace("Vorname", escapedName);
         } catch (IOException ex) {
             log.error("Error reading text overlay SVG from resources", ex);
             return base64Image;
         }
 
+        // Force HTTP/1.1: Next.js treats the default h2c upgrade as a websocket request and drops the connection
         var client = HttpClient.newBuilder()
+                               .version(HttpClient.Version.HTTP_1_1)
                                .connectTimeout(Duration.ofSeconds(5))
                                .build();
-        var requestHttp = HttpRequest.newBuilder()
-                                     .uri(URI.create("http://localhost:3000/api/html2png"))
-                                     .timeout(Duration.ofSeconds(10))
-                                     .header("Content-Type", "application/json")
-                                     .POST(HttpRequest.BodyPublishers.ofString("{\"html\": \"" + textOverlaySvg.replace("\n", "") + "\"}"))
-                                     .build();
 
         try {
+            var requestHttp = HttpRequest.newBuilder()
+                                         .uri(URI.create("http://localhost:3000/api/svg2png"))
+                                         .timeout(Duration.ofSeconds(15))
+                                         .header("Content-Type", "application/json")
+                                         .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("html", textOverlaySvg))))
+                                         .build();
+
             var response = client.send(requestHttp, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 log.error("Text overlay generation failed with status {} and body: {}", response.statusCode(), response.body());
                 return base64Image;
             }
-            var textOverlayBase64 = response.body();
+            var textOverlayBase64 = objectMapper.readTree(response.body()).path("image").asText(null);
+            if (textOverlayBase64 == null || textOverlayBase64.isBlank()) {
+                log.error("Text overlay response contained no image: {}", response.body());
+                return base64Image;
+            }
 
             return mergeImages(
                     base64ToBufferedImage(textOverlayBase64),
@@ -377,6 +392,10 @@ public class AiImageService {
 
     private String getOverlayImagePath(String background) {
         return String.format("images/%s/overlay.png", background);
+    }
+
+    private String getTextOverlayPath(String background) {
+        return String.format("images/%s/text_overlay.svg", background);
     }
 
     private BufferedImage base64ToBufferedImage(String base64Image) {
