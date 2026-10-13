@@ -31,6 +31,7 @@ dependencies {
     implementation("org.apache.xmlgraphics:batik-transcoder:1.19")
     implementation("org.apache.xmlgraphics:batik-codec:1.19")
     implementation("software.amazon.awssdk:s3:2.35.6")
+    implementation("software.amazon.awssdk:url-connection-client:2.35.6")
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")

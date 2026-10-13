@@ -63,7 +63,9 @@ public class AiImageService {
         var promptConfig = aiConfiguration.getPrompt(userRequest.getGender(), userRequest.getBackground());
 
         try {
+            // Force HTTP/1.1: the default h2c upgrade attempt makes the AI server drop the multipart body
             var client = HttpClient.newBuilder()
+                                   .version(HttpClient.Version.HTTP_1_1)
                                    .connectTimeout(aiConfiguration.getConnectTimeout())
                                    .build();
             var boundary = "----WebKitFormBoundary7MA4YWxkTrZu0gW";
@@ -108,6 +110,8 @@ public class AiImageService {
 
             log.info("Wrote request body ({} bytes), sending request with connect timeout {} and request timeout {}...",
                      body.size(), aiConfiguration.getConnectTimeout(), aiConfiguration.getRequestTimeout());
+
+            log.info("Sending request with prompt: {}", promptConfig.getPrompt().replace("\n", "\\n"));
 
             Instant startedAt = Instant.now();
             var response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());

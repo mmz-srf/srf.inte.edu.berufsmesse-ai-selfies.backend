@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -36,6 +37,7 @@ public class UploadS3Service {
 
         S3Client s3 = S3Client.builder()
                               .region(Region.EU_CENTRAL_1)
+                              .httpClient(UrlConnectionHttpClient.builder().build())
                               .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
                               .build();
 
