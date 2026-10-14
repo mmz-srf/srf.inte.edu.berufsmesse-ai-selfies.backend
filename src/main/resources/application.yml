@@ -78,8 +78,9 @@ location-offset:
       reference-width: 880
       reference-height: 1184
     Radio:
-      x: 1080
-      y: 420
+      x: 1700
+      y: 320
+      scale: 0.75
       reference-width: 3024
       reference-height: 4032
     Sport:
