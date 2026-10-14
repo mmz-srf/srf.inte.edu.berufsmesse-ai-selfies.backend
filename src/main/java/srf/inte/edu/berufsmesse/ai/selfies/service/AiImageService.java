@@ -31,7 +31,12 @@ public class AiImageService {
     public String createImage(StartGenerationRequest request) {
 
         // image of the captured person with AI adjustments
-        var personImage = generateImage(request);
+        var personImage = request.getImage();
+
+        // radio background needs no AI generation, person keeps their normal clothing
+        if (!request.getBackground().equals("Radio"))
+            personImage = generateImage(request);
+
         if (personImage == null || personImage.isBlank()) {
             log.error("Generated person image is empty");
             return null;
