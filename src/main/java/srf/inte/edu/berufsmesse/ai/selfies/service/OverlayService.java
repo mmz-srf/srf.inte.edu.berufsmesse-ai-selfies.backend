@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.OverlayOffsetConfiguration;
+import srf.inte.edu.berufsmesse.ai.selfies.model.GreenscreenResult;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.StartGenerationRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.utils.ImageUtils;
 
@@ -49,7 +50,7 @@ public class OverlayService {
         return greenscreenRemovalService.mergeImages(overlay, background, offset.getX(), offset.getY(), false);
     }
 
-    public String addTextOverlay(String base64Image, StartGenerationRequest request) {
+    public String addTextOverlay(GreenscreenResult data, StartGenerationRequest request) {
         var classloader = Thread.currentThread().getContextClassLoader();
 
         String textOverlaySvg;
@@ -59,7 +60,7 @@ public class OverlayService {
         try (InputStream textOverlayStream = classloader.getResourceAsStream(overlayPath)) {
             if (textOverlayStream == null) {
                 log.error("Text overlay SVG not found for background {}", request.getBackground());
-                return base64Image;
+                return data.image();
             }
             textOverlaySvg = new String(textOverlayStream.readAllBytes(), StandardCharsets.UTF_8);
             var escapedName = HtmlUtils.htmlEscape(request.getName());
@@ -67,7 +68,7 @@ public class OverlayService {
             textOverlaySvg = textOverlaySvg.replace("Vorname", escapedName);
         } catch (IOException ex) {
             log.error("Error reading text overlay SVG from resources", ex);
-            return base64Image;
+            return data.image();
         }
 
         // Force HTTP/1.1: Next.js treats the default h2c upgrade as a websocket request and drops the connection
@@ -82,33 +83,37 @@ public class OverlayService {
                                          .timeout(Duration.ofSeconds(15))
                                          .header("Content-Type", "application/json")
                                          .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(
-                                                 Map.of("html", textOverlaySvg))))
+                                                 Map.of(
+                                                         "html", textOverlaySvg,
+                                                         "resX", data.resX(),
+                                                         "resY", data.resY()
+                                                 ))))
                                          .build();
 
             var response = client.send(requestHttp, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 log.error("Text overlay generation failed with status {} and body: {}", response.statusCode(), response.body());
-                return base64Image;
+                return data.image();
             }
             var textOverlayBase64 = objectMapper.readTree(response.body()).path("image").asText(null);
             if (textOverlayBase64 == null || textOverlayBase64.isBlank()) {
                 log.error("Text overlay response contained no image: {}", response.body());
-                return base64Image;
+                return data.image();
             }
 
             return greenscreenRemovalService.mergeImages(
                     ImageUtils.base64ToBufferedImage(textOverlayBase64),
-                    Objects.requireNonNull(ImageUtils.base64ToBufferedImage(base64Image)),
+                    Objects.requireNonNull(ImageUtils.base64ToBufferedImage(data.image())),
                     0,
                     0,
                     false
             );
         } catch (IOException ex) {
             log.error("Error generating text overlay image", ex);
-            return base64Image;
+            return data.image();
         } catch (InterruptedException interruptedException) {
             Thread.currentThread().interrupt();
-            return base64Image;
+            return data.image();
         }
     }
 }

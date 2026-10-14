@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.AiConfiguration;
+import srf.inte.edu.berufsmesse.ai.selfies.model.GreenscreenResult;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.StartGenerationRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.utils.ImageUtils;
 
@@ -47,10 +48,11 @@ public class AiImageService {
         var greenscreenImage = greenscreenRemovalService.replaceGreenscreenAndMerge(request, rotatedImage);
 
         // image with overlayed objects over the person
-        var overlayImage = overlayService.addOverlay(greenscreenImage, request.getBackground());
+        var overlayImage = overlayService.addOverlay(greenscreenImage.image(), request.getBackground());
 
-        // the final image with a text overlay displaying the name
-        var textOverlayImage = overlayService.addTextOverlay(overlayImage, request);
+        // the final image with a text overlay displaying the name, resolution of background image for correct svg scaling
+        var textOverlayImage = overlayService.addTextOverlay(new GreenscreenResult(overlayImage, greenscreenImage.resX(),
+                                                                                   greenscreenImage.resY()), request);
 
         // intermediate steps stay PNG to avoid repeated lossy compression, only the final result is JPEG
         var finalImage = textOverlayImage != null ? ImageUtils.convertBase64ToJpeg(textOverlayImage) : null;

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.LocationOffsetConfiguration;
+import srf.inte.edu.berufsmesse.ai.selfies.model.GreenscreenResult;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.StartGenerationRequest;
 import srf.inte.edu.berufsmesse.ai.selfies.utils.ImageUtils;
 
@@ -33,7 +34,7 @@ public class GreenscreenRemovalService {
     private static final int EDGE_DESPILL_RADIUS = 2;
     private final LocationOffsetConfiguration locationOffsetConfiguration;
 
-    public String replaceGreenscreenAndMerge(StartGenerationRequest request, String imageBase64) {
+    public GreenscreenResult replaceGreenscreenAndMerge(StartGenerationRequest request, String imageBase64) {
         var offset = locationOffsetConfiguration.getForLocation(request.getBackground());
         log.info("Using location offset for {}: x={}, y={}, scale={}", request.getBackground(), offset.getX(),
                  offset.getY(), offset.getScale());
@@ -82,7 +83,13 @@ public class GreenscreenRemovalService {
                      scaledBackground.getWidth(), scaledBackground.getHeight()
             );
 
-            return mergeImages(foreground, scaledBackground, offset.getX() + xCorrection, offset.getY(), true);
+            var resultImage = mergeImages(foreground, scaledBackground, offset.getX() + xCorrection, offset.getY(), true);
+
+            return new GreenscreenResult(
+                    resultImage,
+                    scaledBackground.getWidth(),
+                    scaledBackground.getHeight()
+            );
         } catch (IllegalArgumentException ex) {
             log.error("Invalid base64 input for greenscreen replacement", ex);
             return null;

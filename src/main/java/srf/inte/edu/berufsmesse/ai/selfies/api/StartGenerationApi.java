@@ -36,7 +36,7 @@ public class StartGenerationApi {
             );
         }
 
-        var imageUrl = uploadS3Service.upload(base64OutputImage, UUID.randomUUID().toString());
+        var imageUrl = uploadS3Service.upload(base64OutputImage, UUID.randomUUID() + ".jpg");
 
         return new ResponseEntity<>(
                 Map.of(
