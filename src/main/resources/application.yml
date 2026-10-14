@@ -69,6 +69,7 @@ location-offset:
     Arena:
       x: 640
       y: 50
+      scale: 1.15
       reference-width: 880
       reference-height: 1184
     Meteo:
@@ -107,6 +108,6 @@ overlay-offset:
       y: -60
       scale: 1.0
     Arena:
-      x: -10
-      y: -40
+      x: -20
+      y: -70
       scale: 1.0
