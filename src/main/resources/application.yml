@@ -30,7 +30,7 @@ ai-config:
       steps: 5
       gender: "male"
       location: "Tagesschau"
-    - prompt: "Change only the persons clothing to an elegant white silk blouse with a classic collar and subtle button details, paired with matching navy blue straight-leg trousers. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+    - prompt: "Change only the persons clothing to a navy blue suit with long arms (jacket and trousers) with a crisp white dress shirt and a solid dark tie. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The Person should remain upright."
       seed: 43
       steps: 5
       gender: "female"
@@ -50,7 +50,7 @@ ai-config:
       steps: 5
       gender: "male"
       location: "Arena"
-    - prompt: "Change only the persons clothing to an elegant white silk blouse with a classic collar and subtle button details, paired with matching navy blue straight-leg trousers. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+    - prompt: "Change only the persons clothing to a navy blue suit with long arms (jacket and trousers) with a crisp white dress shirt and a solid dark tie. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The Person should remain upright."
       seed: 43
       steps: 5
       gender: "female"
