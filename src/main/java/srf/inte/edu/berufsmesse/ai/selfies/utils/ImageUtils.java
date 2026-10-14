@@ -53,6 +53,37 @@ public class ImageUtils {
         return null;
     }
 
+    /**
+     * Re-encodes a base64 image as JPEG. JPEG has no alpha channel, so the image is first drawn onto an opaque white canvas.
+     */
+    public static String convertBase64ToJpeg(String base64Image) {
+        BufferedImage image = base64ToBufferedImage(base64Image);
+        if (image == null) {
+            log.error("Could not decode image for JPEG conversion");
+            return null;
+        }
+
+        BufferedImage rgbImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = rgbImage.createGraphics();
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, image.getWidth(), image.getHeight());
+        g.drawImage(image, 0, 0, null);
+        g.dispose();
+
+        try {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            boolean written = ImageIO.write(rgbImage, "jpeg", output);
+            if (!written || output.size() == 0) {
+                log.error("Could not encode JPEG image. written={}, size={} bytes", written, output.size());
+                return null;
+            }
+            return Base64.getEncoder().encodeToString(output.toByteArray());
+        } catch (IOException ex) {
+            log.error("Error writing JPEG image", ex);
+        }
+        return null;
+    }
+
     public static BufferedImage readImageFromResources(String path) {
         var classloader = Thread.currentThread().getContextClassLoader();
         BufferedImage image;

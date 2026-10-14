@@ -44,7 +44,7 @@ public class UploadS3Service {
         PutObjectRequest request = PutObjectRequest.builder()
                                                    .bucket(s3Properties.getBucket())
                                                    .key(s3Properties.getUserPath() + name)
-                                                   .contentType("image/png")
+                                                   .contentType("image/jpeg")
                                                    .build();
 
         s3.putObject(request, RequestBody.fromBytes(image));

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import srf.inte.edu.berufsmesse.ai.selfies.configuration.AiConfiguration;
 import srf.inte.edu.berufsmesse.ai.selfies.model.request.StartGenerationRequest;
+import srf.inte.edu.berufsmesse.ai.selfies.utils.ImageUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,8 +52,11 @@ public class AiImageService {
         // the final image with a text overlay displaying the name
         var textOverlayImage = overlayService.addTextOverlay(overlayImage, request);
 
-        log.info("Generated image of size {} bytes", textOverlayImage != null ? Base64.getDecoder().decode(textOverlayImage).length : "null");
-        return textOverlayImage;
+        // intermediate steps stay PNG to avoid repeated lossy compression, only the final result is JPEG
+        var finalImage = textOverlayImage != null ? ImageUtils.convertBase64ToJpeg(textOverlayImage) : null;
+
+        log.info("Generated image of size {} bytes", finalImage != null ? Base64.getDecoder().decode(finalImage).length : "null");
+        return finalImage;
     }
 
     private String generateImage(StartGenerationRequest userRequest, String rotatedImage) {
