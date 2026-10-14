@@ -78,7 +78,7 @@ location-offset:
       y: 200
     Tagesschau:
       x: 0
-      y: 0
+      y: 200
 
 # Change the offset of the overlay in the image
 overlay-offset:
@@ -87,3 +87,7 @@ overlay-offset:
       x: 1136
       y: 938
       scale: 0.18
+    Tagesschau:
+      x: 0
+      y: -36
+      scale: 1.0
