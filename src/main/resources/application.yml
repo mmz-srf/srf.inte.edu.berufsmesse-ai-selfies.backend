@@ -72,9 +72,9 @@ location-offset:
       reference-width: 880
       reference-height: 1184
     Meteo:
-      x: 680
-      y: 50
-      scale: 0.85
+      x: 710
+      y: 180
+      scale: 0.95
       reference-width: 880
       reference-height: 1184
     Radio:
