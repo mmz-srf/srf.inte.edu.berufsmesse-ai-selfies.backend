@@ -15,11 +15,48 @@ s3:
 ai-config:
   url: "http://ec2-63-182-192-6.eu-central-1.compute.amazonaws.com:8080/generate"
   prompts:
-  -   prompt: "Change only the persons clothing to a navy blue suit with long arms (jacket and trousers) with a crisp white dress shirt and a solid dark tie. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The Person should remain upright."
+    - prompt: "Change only the persons clothing to a smart casual summer outfit consisting of light beige chino trousers and a slim-fit light blue short-sleeved linen shirt. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
       seed: 43
       steps: 5
       gender: "male"
       location: "Meteo"
+    - prompt: "Change only the persons clothing to a smart casual summer outfit consisting of a flowy midi skirt in soft pastel and a tucked-in short-sleeved blouse in a complementary light tone. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+      seed: 43
+      steps: 5
+      gender: "female"
+      location: "Meteo"
+    - prompt: "Change only the persons clothing to a navy blue suit with long arms (jacket and trousers) with a crisp white dress shirt and a solid dark tie. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The Person should remain upright."
+      seed: 43
+      steps: 5
+      gender: "male"
+      location: "Tagesschau"
+    - prompt: "Change only the persons clothing to an elegant white silk blouse with a classic collar and subtle button details, paired with matching navy blue straight-leg trousers. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+      seed: 43
+      steps: 5
+      gender: "female"
+      location: "Tagesschau"
+    - prompt: "The person in image 1 should wear exactly the football jersey shown in image 2. Transfer the jersey from image 2 onto the person in image 1, preserving all details of the jersey including colors, patterns, logos, badges and fabric texture exactly as they appear in image 2. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+      seed: 43
+      steps: 5
+      gender: "male"
+      location: "Sportstudio"
+    - prompt: "The person in image 1 should wear exactly the football jersey shown in image 2. Transfer the jersey from image 2 onto the person in image 1, preserving all details of the jersey including colors, patterns, logos, badges and fabric texture exactly as they appear in image 2. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+      seed: 43
+      steps: 5
+      gender: "female"
+      location: "Sportstudio"
+    - prompt: "Change only the persons clothing to a navy blue suit with long arms (jacket and trousers) with a crisp white dress shirt and a solid dark tie. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The Person should remain upright."
+      seed: 43
+      steps: 5
+      gender: "male"
+      location: "Arena"
+    - prompt: "Change only the persons clothing to an elegant white silk blouse with a classic collar and subtle button details, paired with matching navy blue straight-leg trousers. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+      seed: 43
+      steps: 5
+      gender: "female"
+      location: "Arena"
+
+
   connectTimeout: 10s
   requestTimeout: 180s
 
