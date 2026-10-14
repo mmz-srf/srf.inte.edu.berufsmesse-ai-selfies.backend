@@ -31,19 +31,19 @@ public class AiImageService {
     public String createImage(StartGenerationRequest request) {
 
         // image of the captured person with AI adjustments
-        var personImage = request.getImage();
+        var rotatedImage = imageRotationService.rotateImage(request.getImage());
 
         // radio background needs no AI generation, person keeps their normal clothing
         if (!request.getBackground().equals("Radio"))
-            personImage = generateImage(request);
+            rotatedImage = generateImage(request, rotatedImage);
 
-        if (personImage == null || personImage.isBlank()) {
+        if (rotatedImage == null || rotatedImage.isBlank()) {
             log.error("Generated person image is empty");
             return null;
         }
 
         // person in front of the background with greenscreen removed
-        var greenscreenImage = greenscreenRemovalService.replaceGreenscreenAndMerge(request, personImage);
+        var greenscreenImage = greenscreenRemovalService.replaceGreenscreenAndMerge(request, rotatedImage);
 
         // image with overlayed objects over the person
         var overlayImage = overlayService.addOverlay(greenscreenImage, request.getBackground());
@@ -55,7 +55,7 @@ public class AiImageService {
         return textOverlayImage;
     }
 
-    private String generateImage(StartGenerationRequest userRequest) {
+    private String generateImage(StartGenerationRequest userRequest, String rotatedImage) {
 
         log.info("Generating image at {}", aiConfiguration.getUrl());
         var promptConfig = aiConfiguration.getPrompt(userRequest.getGender(), userRequest.getBackground());
@@ -92,7 +92,7 @@ public class AiImageService {
             body.write("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpeg\"\r\n".getBytes());
             body.write("Content-Type: image/jpeg\r\n\r\n".getBytes());
 
-            byte[] imageBytes = imageRotationService.normalizeOrientation(Base64.getDecoder().decode(userRequest.getImage()));
+            byte[] imageBytes = Base64.getDecoder().decode(rotatedImage);
             body.write(imageBytes);
 
             body.write("\r\n".getBytes());

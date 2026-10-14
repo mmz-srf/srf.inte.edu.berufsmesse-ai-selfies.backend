@@ -11,11 +11,19 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class ImageRotationService {
+    // Rotates a base64 image returning it as base64 again
+    public String rotateImage(String base64Image) {
+        byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+        byte[] rotatedBytes = normalizeOrientation(imageBytes);
+        return Base64.getEncoder().encodeToString(rotatedBytes);
+    }
+
     /**
      * Cameras commonly store portrait photos as landscape pixel data plus an EXIF
      * orientation tag telling viewers how to rotate it for display. Neither the AI
@@ -24,7 +32,7 @@ public class ImageRotationService {
      * Bakes the rotation into the pixels once, up front, so every step downstream
      * can treat the image as already upright. Images without a tag stay untouched.
      */
-    public byte[] normalizeOrientation(byte[] jpegBytes) {
+    private byte[] normalizeOrientation(byte[] jpegBytes) {
         int orientation = readExifOrientation(jpegBytes);
         if (orientation <= 1) {
             return jpegBytes;
