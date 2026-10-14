@@ -15,12 +15,12 @@ s3:
 ai-config:
   url: "http://ec2-63-182-192-6.eu-central-1.compute.amazonaws.com:8080/generate"
   prompts:
-    - prompt: "Change only the persons clothing to a smart casual summer outfit consisting of light beige chino trousers and a slim-fit light blue short-sleeved linen shirt. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+    - prompt: "Change only the persons clothing to a vibrant short-sleeve Hawaiian aloha shirt with a tropical floral and palm leaf pattern, left slightly unbuttoned at the top, paired with breathable, cream-colored linen trousers."
       seed: 43
       steps: 5
       gender: "male"
       location: "Meteo"
-    - prompt: "Change only the persons clothing to a smart casual summer outfit consisting of a flowy midi skirt in soft pastel and a tucked-in short-sleeved blouse in a complementary light tone. Do not modify the face in any way — preserve every detail exactly as it appears in the original image, including facial structure, skin texture, skin tone, expression, eyes, nose, mouth, and any natural imperfections. The face must look identical to the original. Do not alter the background in any way. Only the clothing changes — nothing else. The person should remain upright."
+    - prompt: "Change only the persons clothing to a chic, breezy summer outfit in a modern Hawaiian aloha style, featuring an oversized tropical print button-down shirt tied at the waist, paired with high-waisted white denim shorts."
       seed: 43
       steps: 5
       gender: "female"
