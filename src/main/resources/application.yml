@@ -67,7 +67,7 @@ ai-config:
 location-offset:
   values:
     Arena:
-      x: 640
+      x: 600
       y: 50
       scale: 1.15
       reference-width: 880
