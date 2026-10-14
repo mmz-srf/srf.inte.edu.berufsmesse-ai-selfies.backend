@@ -84,6 +84,24 @@ public class ImageUtils {
         return null;
     }
 
+    /**
+     * Reads the raw bytes of a resource file, without decoding/re-encoding it.
+     */
+    public static byte[] readBytesFromResources(String path) {
+        var classloader = Thread.currentThread().getContextClassLoader();
+
+        try (InputStream stream = classloader.getResourceAsStream(path)) {
+            if (stream == null) {
+                log.error("Resource not found at {}", path);
+                return null;
+            }
+            return stream.readAllBytes();
+        } catch (IOException ex) {
+            log.error("Error reading resource {}", path, ex);
+            return null;
+        }
+    }
+
     public static BufferedImage readImageFromResources(String path) {
         var classloader = Thread.currentThread().getContextClassLoader();
         BufferedImage image;

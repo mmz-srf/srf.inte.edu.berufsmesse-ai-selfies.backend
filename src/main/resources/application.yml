@@ -74,7 +74,7 @@ location-offset:
       x: 1080
       y: 420
     Sport:
-      x: 768
+      x: 600
       y: 200
     Tagesschau:
       x: 0
@@ -84,8 +84,8 @@ location-offset:
 overlay-offset:
   values:
     Sport:
-      x: 1136
-      y: 938
+      x: 960
+      y: 900
       scale: 0.18
     Tagesschau:
       x: 0

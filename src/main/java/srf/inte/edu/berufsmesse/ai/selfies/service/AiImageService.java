@@ -95,11 +95,25 @@ public class AiImageService {
             body.write(("--" + boundary + "\r\n").getBytes());
             body.write("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpeg\"\r\n".getBytes());
             body.write("Content-Type: image/jpeg\r\n\r\n".getBytes());
-
             byte[] imageBytes = Base64.getDecoder().decode(rotatedImage);
             body.write(imageBytes);
-
             body.write("\r\n".getBytes());
+
+            // sport requests send the trikot as second image, the AI server expects it in the "background" field
+            if (userRequest.getBackground().equals("Sport")) {
+                byte[] trikotBytes = ImageUtils.readBytesFromResources("images/Sport/trikot.jpeg");
+                if (trikotBytes == null) {
+                    log.error("Failed to read trikot image for Sport background");
+                    return null;
+                }
+
+                body.write(("--" + boundary + "\r\n").getBytes());
+                body.write("Content-Disposition: form-data; name=\"background\"; filename=\"trikot.jpeg\"\r\n".getBytes());
+                body.write("Content-Type: image/jpeg\r\n\r\n".getBytes());
+                body.write(trikotBytes);
+                body.write("\r\n".getBytes());
+            }
+
             body.write(("--" + boundary + "--\r\n").getBytes());
 
             var request = HttpRequest.newBuilder()
