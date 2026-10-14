@@ -65,7 +65,7 @@ location-offset:
   values:
     Arena:
       x: 640
-      y: 0
+      y: 50
     Meteo:
       x: 680
       y: 50
@@ -90,4 +90,8 @@ overlay-offset:
     Tagesschau:
       x: 0
       y: -36
+      scale: 1.0
+    Arena:
+      x: -10
+      y: -40
       scale: 1.0
