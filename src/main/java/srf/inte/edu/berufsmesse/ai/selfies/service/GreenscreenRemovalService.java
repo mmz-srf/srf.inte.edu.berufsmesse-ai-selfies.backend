@@ -52,9 +52,27 @@ public class GreenscreenRemovalService {
                 return null;
             }
 
-            // Downscale the background relative to the person's true (unscaled) resolution,
+            log.info("Received person image of {}x{}", foreground.getWidth(), foreground.getHeight());
+
+            // Without a reference size the background downscaling below (and with it every pixel offset and the
+            // overlays) depends on the resolution of the camera / AI output, which differs between devices
+            int sizingWidth = foreground.getWidth();
+            int sizingHeight = foreground.getHeight();
+            int xCorrection = 0;
+            if (offset.hasReferenceSize()) {
+                sizingWidth = offset.getReferenceWidth();
+                sizingHeight = offset.getReferenceHeight();
+                if (foreground.getHeight() != sizingHeight) {
+                    foreground = ImageUtils.scaleImage(foreground, (double) sizingHeight / foreground.getHeight());
+                    log.info("Normalized person image to {}x{}", foreground.getWidth(), foreground.getHeight());
+                }
+                // a narrower/wider image than the reference would shift the (centered) person sideways
+                xCorrection = (int) Math.round((sizingWidth - foreground.getWidth()) / 2.0 * offset.getScale());
+            }
+
+            // Downscale the background relative to the person's (reference) resolution,
             // then apply the location's scale purely for framing within the final composite.
-            var scaledBackground = downscaleBackgroundIfNeeded(background, foreground);
+            var scaledBackground = downscaleBackgroundIfNeeded(background, sizingWidth, sizingHeight);
             if (offset.getScale() != 1.0) {
                 foreground = ImageUtils.scaleImage(foreground, offset.getScale());
             }
@@ -64,7 +82,7 @@ public class GreenscreenRemovalService {
                      scaledBackground.getWidth(), scaledBackground.getHeight()
             );
 
-            return mergeImages(foreground, scaledBackground, offset.getX(), offset.getY(), true);
+            return mergeImages(foreground, scaledBackground, offset.getX() + xCorrection, offset.getY(), true);
         } catch (IllegalArgumentException ex) {
             log.error("Invalid base64 input for greenscreen replacement", ex);
             return null;
@@ -288,9 +306,9 @@ public class GreenscreenRemovalService {
         return Math.max(0.0, Math.min(1.0, value));
     }
 
-    private BufferedImage downscaleBackgroundIfNeeded(BufferedImage background, BufferedImage foreground) {
-        int maxAllowedWidth = (int) Math.round(foreground.getWidth() * MAX_BACKGROUND_TO_FOREGROUND_SCALE);
-        int maxAllowedHeight = (int) Math.round(foreground.getHeight() * MAX_BACKGROUND_TO_FOREGROUND_SCALE);
+    private BufferedImage downscaleBackgroundIfNeeded(BufferedImage background, int foregroundWidth, int foregroundHeight) {
+        int maxAllowedWidth = (int) Math.round(foregroundWidth * MAX_BACKGROUND_TO_FOREGROUND_SCALE);
+        int maxAllowedHeight = (int) Math.round(foregroundHeight * MAX_BACKGROUND_TO_FOREGROUND_SCALE);
 
         if (background.getWidth() <= maxAllowedWidth && background.getHeight() <= maxAllowedHeight) {
             return background;
