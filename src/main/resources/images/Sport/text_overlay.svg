@@ -1,42 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 1920 1080">
+<svg id="Ebene_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1920 1080">
   <!-- Generator: Adobe Illustrator 30.3.0, SVG Export Plug-In . SVG Version: 2.1.3 Build 182)  -->
   <defs>
     <style>
-      .st0 {
-        fill: none;
-      }
-
-      .st1, .st2 {
+      .st1 {
         fill: #fff;
       }
 
-      .st2, .st3 {
-        font-family: SRGSSRType-Bold, 'SRG SSR Type';
-        font-size: 115px;
-        font-weight: 700;
-      }
-
-      .st4 {
-        fill: #ff0037;
-      }
-
-      .st5 {
-        font-family: SRGSSRType-Regular, 'SRG SSR Type';
-        font-size: 30px;
-      }
-
       .st6 {
-        fill: #af001e;
+      fill: #af001e;
       }
 
-      .st7 {
-        clip-path: url(#clippath);
+      /* Name display (lower third). The box grows with the name; it is anchored at the bottom,
+      so a name on two lines grows upwards. Sizes are in viewBox units. */
+      .frame {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      }
+
+      .lower-third {
+      position: absolute;
+      left: 88px;
+      bottom: 54px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      font-family: 'SRG SSR Type', sans-serif;
+      }
+
+      .lower-third .name, .lower-third .subtitle {
+      box-sizing: border-box;
+      width: max-content;
+      white-space: pre;
+      }
+
+      .name {
+      background: #ff0037;
+      color: #fff;
+      font-size: 62px;
+        font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.25;
+      padding: 0 0.4em 0 25px;
+      }
+
+      .subtitle {
+      background: #fff;
+      color: #000;
+        font-size: 30px;
+      line-height: 1.6;
+      padding: 0 0.8em 0 25px;
       }
     </style>
-    <clipPath id="clippath">
-      <rect class="st0" x="88" y="900.7" width="707.6" height="74.6"/>
-    </clipPath>
   </defs>
   <g>
     <g>
@@ -53,11 +69,78 @@
       <path class="st1" d="M110.5,66.6l-.2.9c0,.3,0,.4,0,.5,0,.2,0,.4.2.7l2.6,4.7c.2.4.4.5.9.5h2.4c.3,0,.7-.2.3-.8l-3.2-5.4c1.1-.7,2.3-1.7,2.3-3.8s-1.6-4.3-5-4.3h-5c-.4,0-.6.2-.6.6v13.1c0,.4.1.6.6.6h2c.4,0,.6-.2.6-.6v-11h2.1c1.3,0,2,.5,2,1.7s-.5,1.5-1,1.7c-.6.3-.9,0-1.1.8"/>
     </g>
   </g>
-  <rect class="st4" x="88" y="900.7" width="707.6" height="74.6"/>
-  <g class="st7">
-    <text class="st2" transform="translate(81.8 976.7)"><tspan x="0" y="0">VORNAME</tspan></text>
-    <text class="st3" transform="translate(-113 628.8)"><tspan x="0" y="0">LOREM IPSUM</tspan></text>
-  </g>
-  <rect class="st1" x="88" y="975.4" width="288.5" height="60.1"/>
-  <text class="st5" transform="translate(113 1016.2)"><tspan x="0" y="0">Berufsmesse 2026</tspan></text>
+  <foreignObject x="0" y="0" width="1920" height="1080">
+    <div xmlns="http://www.w3.org/1999/xhtml" class="frame">
+      <div class="lower-third">
+        <div class="name" data-max-width="700">Vorname</div>
+        <div class="subtitle">Berufsmesse 2026</div>
+      </div>
+    </div>
+  </foreignObject>
+  <script><![CDATA[
+    // Fits the name into the lower third: one line if possible, otherwise two lines (preferably between first and
+    // last name, else after a hyphen). A name that only slightly doesn't fit is scaled down a bit instead, and a
+    // name that still doesn't fit (e.g. one very long word) is scaled down until it does.
+    (function () {
+      function layout() {
+        var bar = document.querySelector('.lower-third .name');
+        if (!bar) {
+          return;
+        }
+        var maxWidth = parseFloat(bar.getAttribute('data-max-width'));
+        var fixedInset = parseFloat(getComputedStyle(bar).paddingLeft);
+        var name = bar.textContent.replace(/\s+/g, ' ').trim();
+
+        function measure(lines) {
+          bar.textContent = lines.join('\n');
+          return { lines: lines, width: bar.offsetWidth };
+        }
+
+        function narrowest(layouts) {
+          return layouts.reduce(function (best, current) {
+            return best === null || current.width < best.width ? current : best;
+          }, null);
+        }
+
+        var spaceSplits = [];
+        var hyphenSplits = [];
+        for (var i = 1; i < name.length; i++) {
+          if (name.charAt(i) === ' ') {
+            spaceSplits.push(measure([name.slice(0, i), name.slice(i + 1)]));
+          } else if (name.charAt(i - 1) === '-') {
+            hyphenSplits.push(measure([name.slice(0, i), name.slice(i)]));
+          }
+        }
+
+        // how much a layout may be scaled down to avoid a worse line break
+        var slightlyTooWide = maxWidth * 1.06;
+        var noticeablyTooWide = maxWidth * 1.12;
+
+        var best = measure([name]);
+        if (best.width > slightlyTooWide) {
+          var bySpace = narrowest(spaceSplits);
+          var byHyphen = narrowest(hyphenSplits);
+          if (bySpace !== null && bySpace.width <= noticeablyTooWide) {
+            best = bySpace;
+          } else if (byHyphen !== null && byHyphen.width <= maxWidth) {
+            best = byHyphen;
+          } else {
+            best = narrowest([best, bySpace, byHyphen].filter(function (layout) { return layout !== null; }));
+          }
+        }
+
+        bar.textContent = best.lines.join('\n');
+        if (best.width > maxWidth) {
+          var fontSize = parseFloat(getComputedStyle(bar).fontSize);
+          bar.style.fontSize = (fontSize * (maxWidth - fixedInset) / (best.width - fixedInset)) + 'px';
+        }
+      }
+
+      // Measure only with the SRG SSR Type font loaded, the fallback font has different widths
+      var weights = ['400', '500', '700'];
+      Promise.all(weights.map(function (weight) {
+        return document.fonts.load(weight + ' 20px "SRG SSR Type"');
+      })).then(layout, layout);
+    })();
+  ]]></script>
 </svg>
