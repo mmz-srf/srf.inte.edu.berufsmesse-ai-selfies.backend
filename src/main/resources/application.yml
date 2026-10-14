@@ -61,27 +61,37 @@ ai-config:
   requestTimeout: 180s
 
 # Change the offset of the person in the image
-# reference-height: height (px) of the person image the offsets were tuned with (see the "Received person image of WxH"
-# log line). The person is resized to it first, so cameras with other resolutions give the same result.
+# reference-width/-height: size (px) of the person image the offsets were tuned with (see the "Received person image of WxH"
+# log line). The background is sized from it and the person resized to it, so other camera / AI resolutions give the same result.
+# Tuned on the PC with greenscreen-test.jpeg (3024x4032): the AI returns 880x1184 for it, Radio skips the AI.
 location-offset:
   values:
     Arena:
       x: 640
       y: 50
+      reference-width: 880
+      reference-height: 1184
     Meteo:
       x: 680
       y: 50
       scale: 0.85
+      reference-width: 880
+      reference-height: 1184
     Radio:
       x: 1080
       y: 420
-      reference-height: 4032 # greenscreen-test.jpeg, Radio skips the AI so it is used as is
+      reference-width: 3024
+      reference-height: 4032
     Sport:
       x: 600
       y: 200
+      reference-width: 880
+      reference-height: 1184
     Tagesschau:
       x: 0
       y: 200
+      reference-width: 880
+      reference-height: 1184
 
 # Change the offset of the overlay in the image
 overlay-offset:
@@ -92,7 +102,7 @@ overlay-offset:
       scale: 0.18
     Tagesschau:
       x: 0
-      y: -36
+      y: -60
       scale: 1.0
     Arena:
       x: -10

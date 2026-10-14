@@ -34,8 +34,14 @@ public class LocationOffsetConfiguration {
         private int x = 0;
         private int y = 0;
         private double scale = 1.0;
-        // Height (px) of the person image the offsets were tuned with. The person is resized to this height first,
-        // so the result looks the same regardless of the camera resolution. Not set = no normalization.
+        // Size (px) of the person image the offsets were tuned with. When both are set, the background is sized from
+        // this instead of the actual person image and the person is resized to referenceHeight, so the result looks
+        // the same regardless of the camera / AI output resolution. Not set = no normalization.
+        private Integer referenceWidth;
         private Integer referenceHeight;
+
+        public boolean hasReferenceSize() {
+            return referenceWidth != null && referenceHeight != null;
+        }
     }
 }
