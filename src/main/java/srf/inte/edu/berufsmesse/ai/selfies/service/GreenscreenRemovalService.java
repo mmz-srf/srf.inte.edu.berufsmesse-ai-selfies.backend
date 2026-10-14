@@ -37,6 +37,15 @@ public class GreenscreenRemovalService {
                 return null;
             }
 
+            log.info("Received person image of {}x{}", foreground.getWidth(), foreground.getHeight());
+
+            // Bring the person to the resolution the offsets were tuned with, otherwise the background downscaling
+            // below (and with it every pixel offset) depends on the camera resolution of the device
+            if (offset.getReferenceHeight() != null && foreground.getHeight() != offset.getReferenceHeight()) {
+                foreground = ImageUtils.scaleImage(foreground, (double) offset.getReferenceHeight() / foreground.getHeight());
+                log.info("Normalized person image to {}x{}", foreground.getWidth(), foreground.getHeight());
+            }
+
             // Downscale the background relative to the person's true (unscaled) resolution,
             // then apply the location's scale purely for framing within the final composite.
             var scaledBackground = downscaleBackgroundIfNeeded(background, foreground);

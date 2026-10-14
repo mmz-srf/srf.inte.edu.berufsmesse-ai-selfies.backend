@@ -61,6 +61,8 @@ ai-config:
   requestTimeout: 180s
 
 # Change the offset of the person in the image
+# reference-height: height (px) of the person image the offsets were tuned with (see the "Received person image of WxH"
+# log line). The person is resized to it first, so cameras with other resolutions give the same result.
 location-offset:
   values:
     Arena:
@@ -73,6 +75,7 @@ location-offset:
     Radio:
       x: 1080
       y: 420
+      reference-height: 4032 # greenscreen-test.jpeg, Radio skips the AI so it is used as is
     Sport:
       x: 600
       y: 200
