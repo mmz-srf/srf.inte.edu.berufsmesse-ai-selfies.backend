@@ -15,12 +15,12 @@ s3:
 ai-config:
   url: "http://ec2-63-182-192-6.eu-central-1.compute.amazonaws.com:8080/generate"
   prompts:
-    - prompt: "Change only the persons clothing and accessories to a professional yet modern summer business-casual look. The person should wear a premium, fully buttoned-up long-sleeve linen shirt (sleeves neatly rolled up to the elbows) in a crisp white or light blue, tucked into tailored beige chino trousers, and a pair of sleek, professional sunglasses. The midriff must be completely covered. No hats or other headwear."
+    - prompt: "Change only the persons clothing to a well-fitted, classic short polo shirt in a rich burgundy tone, tucked into stylish, form-fitting light brown chino trousers."
       seed: 43
       steps: 5
       gender: "male"
       location: "Meteo"
-    - prompt: "Change only the persons clothing and accessories to a professional yet chic summer business-casual outfit. The person should wear a elegant, lightweight blazer over a fully covered minimalist top or a high-quality, fully buttoned shirt tucked into elegant high-waisted trousers. The outfit must completely cover the stomach and midriff. Add a pair of classy, professional sunglasses. No hats or headwear."
+    - prompt: "Change only the persons clothing to a well-fitted, chic shirt-blouse in a lightweight burgundy tone, tucked into stylish, form-fitting light beige linen trousers."
       seed: 43
       steps: 5
       gender: "female"
